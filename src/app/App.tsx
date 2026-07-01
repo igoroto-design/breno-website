@@ -46,7 +46,7 @@ import { ARTICLE_BLOCKS, ARTICLE_RECOMMENDED, ARTICLE_TOC, slugifyHeading, type 
 const dark  = "#092529";
 const mint  = "#AFD7BF";
 const muted = "#BBABA0";
-const WA        = "https://api.whatsapp.com/send/?phone=5571997250690&text=Olá%2C+Breno%21+Tudo+bem%3F%0A%0AEstou+buscando+acompanhamento+psicológico+e+gostaria+de+saber+mais+sobre+o+seu+atendimento+online.+Vi+seu+site+e+me+identifiquei+com+a+sua+abordagem.%0A%0APoderia+me+passar+informações+sobre+disponibilidade%2C+valores+e+como+funciona+o+primeiro+atendimento%3F%0A%0AObrigado%28a%29%21&type=phone_number&app_absent=0";
+const WA        = "https://api.whatsapp.com/send/?phone=5571997250690&text=Olá%2C+Breno%21+Tudo+bem%3F%0A%0AEstou+buscando+acompanhamento+psicológico+e+gostaria+de+saber+mais+sobre+o+seu+atendimento+online.+Vi+seu+site+e+me+identifiquei+com+a+sua+abordagem.%0A%0APoderia+me+passar+mais+informações%3F%0A%0AObrigado%28a%29%21&type=phone_number&app_absent=0";
 const ARTICLE_IMAGES = [
   // Row 1 — man · woman · therapist pair  (homepage recent)
   imgManContemplative,     // quando-procurar-psicologo

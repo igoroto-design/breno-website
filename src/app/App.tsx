@@ -39,6 +39,7 @@ import imgWomanGlassesLaptop  from "../assets/mulher-oculos-laptop-ansiedade.web
 import imgManCouchLaptop      from "../assets/homem-sofa-terapia-online.webp";
 import imgElderWomanSession2  from "../assets/mulher-idosa-psicanalise-sessao.webp";
 import imgManJournaling       from "../assets/homem-escrevendo-diario-terapia.webp";
+import imgQuandoPsicologo     from "../assets/quando-buscar-psicologo-sinais.webp";
 
 import { ARTICLE_BLOCKS, ARTICLE_RECOMMENDED, ARTICLE_TOC, slugifyHeading, type ArticleBlock } from "./articleBodies";
 
@@ -48,7 +49,7 @@ const muted = "#BBABA0";
 const WA        = "https://api.whatsapp.com/send/?phone=5571997250690&text=Olá%2C+Breno%21+Tudo+bem%3F%0A%0AEstou+buscando+acompanhamento+psicológico+e+gostaria+de+saber+mais+sobre+o+seu+atendimento+online.+Vi+seu+site+e+me+identifiquei+com+a+sua+abordagem.%0A%0APoderia+me+passar+informações+sobre+disponibilidade%2C+valores+e+como+funciona+o+primeiro+atendimento%3F%0A%0AObrigado%28a%29%21&type=phone_number&app_absent=0";
 const ARTICLE_IMAGES = [
   // Row 1 — terapia · ansiedade · psicanálise  (homepage recent)
-  imgHero,                 // quando-procurar-psicologo
+  imgQuandoPsicologo,      // quando-procurar-psicologo
   imgAnxietyWoman,         // ansiedade-12-sintomas
   imgWomanPsicanalise,     // o-que-e-psicanalise
   // Row 2 — autoestima · relacionamentos · terapia

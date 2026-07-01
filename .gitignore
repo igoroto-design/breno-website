@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist.zip
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.DS_Store
+.DS_Store?
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Claude Code session files
+.claude/
+
+# Scripts (not needed in production)
+scripts/

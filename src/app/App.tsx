@@ -48,40 +48,40 @@ const mint  = "#AFD7BF";
 const muted = "#BBABA0";
 const WA        = "https://api.whatsapp.com/send/?phone=5571997250690&text=Olá%2C+Breno%21+Tudo+bem%3F%0A%0AEstou+buscando+acompanhamento+psicológico+e+gostaria+de+saber+mais+sobre+o+seu+atendimento+online.+Vi+seu+site+e+me+identifiquei+com+a+sua+abordagem.%0A%0APoderia+me+passar+informações+sobre+disponibilidade%2C+valores+e+como+funciona+o+primeiro+atendimento%3F%0A%0AObrigado%28a%29%21&type=phone_number&app_absent=0";
 const ARTICLE_IMAGES = [
-  // Row 1 — terapia · ansiedade · psicanálise  (homepage recent)
-  imgQuandoPsicologo,      // quando-procurar-psicologo
+  // Row 1 — man · woman · elder woman  (homepage recent)
+  imgManContemplative,     // quando-procurar-psicologo
   imgAnxietyWoman,         // ansiedade-12-sintomas
-  imgWomanPsicanalise,     // o-que-e-psicanalise
-  // Row 2 — autoestima · relacionamentos · terapia
-  imgManContemplative,     // autoestima-baixa-sinais
-  imgProcess,              // relacionamento-toxico-sinais
+  imgElderWomanSession2,   // o-que-e-psicanalise
+  // Row 2 — young woman · couple · young man
+  imgYoungWomanSession,    // autoestima-baixa-sinais
+  imgCoupleSession,        // relacionamento-toxico-sinais
   imgYoungManPsicologia,   // como-saber-se-preciso-de-terapia
-  // Row 3 — ansiedade · psicanálise · autoestima
+  // Row 3 — woman laptop · man · therapist pair
   imgWomanGlassesLaptop,   // ansiedade-e-insonia
-  imgManBlackSession,      // psicanalise-funciona
+  imgManJournaling,        // psicanalise-funciona
   imgTherapistSupport,     // critica-interna-como-lidar
-  // Row 4 — relacionamentos · terapia · ansiedade
-  imgManAirpodsSession,    // medo-de-abandono
-  imgOnlineWomanLaptop,    // terapia-online-funciona
-  imgManJournaling,        // pensamentos-acelerados
-  // Row 5 — psicanálise · autoestima · relacionamentos
-  imgBenefits,             // psicanalise-vs-tcc
+  // Row 4 — elder woman · man desk · woman tablet
+  imgElderWomanSerene,     // medo-de-abandono
+  imgManOnlineDesk,        // terapia-online-funciona
+  imgWomanTabletOnline,    // pensamentos-acelerados
+  // Row 5 — woman · man expressive · elder woman
+  imgWomanPsicanalise,     // psicanalise-vs-tcc
   imgManBlackExpressive,   // inseguranca
-  imgCoupleSession,        // ciumes-em-excesso
-  // Row 6 — terapia · ansiedade · psicanálise
-  imgManOnlineDesk,        // terapia-online-ou-presencial
-  imgElderWomanSerene,     // ansiedade-sintomas-fisicos
-  imgWomanTabletOnline,    // psicanalise-online
-  // Row 7 — autoestima · relacionamentos · terapia
+  imgElderWomanSmiling,    // ciumes-em-excesso
+  // Row 6 — therapist pair · elder woman · man couch
+  imgTherapistTalking,     // terapia-online-ou-presencial
+  imgQuandoPsicologo,      // ansiedade-sintomas-fisicos
+  imgManCouchLaptop,       // psicanalise-online
+  // Row 7 — young man · woman laptop · man black
   imgYoungManSession,      // terapia-ajuda-autoestima
-  imgManCouchLaptop,       // dependencia-emocional
-  imgTherapistTalking,     // como-escolher-um-psicologo
-  // Row 8 — psicanálise · terapia · psicanálise
-  imgElderWomanSession2,   // quando-procurar-psicanalista
-  imgYoungWomanSession,    // o-que-esperar-da-primeira-sessao
-  imgOlderManGlasses,      // quanto-tempo-dura-psicanalise
+  imgOnlineWomanLaptop,    // dependencia-emocional
+  imgManBlackSession,      // como-escolher-um-psicologo
+  // Row 8 — infographic · older man · man airpods
+  imgBenefits,             // quando-procurar-psicanalista
+  imgOlderManGlasses,      // o-que-esperar-da-primeira-sessao
+  imgManAirpodsSession,    // quanto-tempo-dura-psicanalise
   // Row 9
-  imgElderWomanSmiling,    // quanto-tempo-dura-a-terapia
+  imgProcess,              // quanto-tempo-dura-a-terapia
 ];
 const SITE_BASE = "https://brenovieirapsi.com";
 

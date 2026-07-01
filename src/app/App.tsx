@@ -13,6 +13,7 @@ import {
   Layers, Sparkles, Sun, Users, Wind,
 } from "lucide-react";
 
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import imgHero            from "../assets/breno-psicologo-hero.webp";
 import imgAbout           from "../assets/breno-psicologo-sobre.webp";
 import imgBenefits        from "../assets/beneficios-psicoterapia.webp";
@@ -2256,6 +2257,7 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <BrowserRouter>
         <Layout />
+        <SpeedInsights />
       </BrowserRouter>
     </MotionConfig>
   );

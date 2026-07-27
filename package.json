@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr src/ssr/entry-server.tsx --outDir dist/server && node scripts/prerender.mjs && node scripts/optimize-images.mjs && node scripts/generate-404.mjs && node scripts/generate-sitemap.mjs && rm -rf dist/server",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,7 +20,9 @@
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "sharp": "^0.35.3",
     "tailwindcss": "4.1.12",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "vite-plugin-image-optimizer": "^2.0.3"
   }
 }

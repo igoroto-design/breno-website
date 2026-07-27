@@ -42,6 +42,13 @@ import imgManJournaling       from "../assets/homem-escrevendo-diario-terapia.we
 import imgQuandoPsicologo     from "../assets/quando-buscar-psicologo-sinais.webp";
 
 import { ARTICLE_BLOCKS, ARTICLE_RECOMMENDED, ARTICLE_TOC, slugifyHeading, type ArticleBlock } from "./articleBodies";
+import { SITE_BASE } from "./siteConfig";
+import {
+  getPageSEO,
+  injectHeadTags,
+  HOMEPAGE_FAQS,
+  type FAQItem,
+} from "./seoUtils";
 
 const dark  = "#092529";
 const mint  = "#AFD7BF";
@@ -81,9 +88,8 @@ const ARTICLE_IMAGES = [
   imgManBlackSession,      // o-que-esperar-da-primeira-sessao
   imgElderWomanSerene,     // quanto-tempo-dura-psicanalise
   // Row 9
-  imgQuandoPsicologo,      // quanto-tempo-dura-a-terapia
+  imgQuandoPsicologo,     // quanto-tempo-dura-a-terapia
 ];
-const SITE_BASE = "https://brenovieirapsi.com";
 
 async function sharePage({ title, text, path }: { title: string; text: string; path: string }) {
   const url = typeof window !== "undefined"
@@ -202,6 +208,13 @@ const ARTICLES: Article[] = RAW.map(([slug,title,excerpt,category,categorySlug,d
   image: ARTICLE_IMAGES[i],
   content: `${excerpt}\n\nA psicoterapia oferece um espaço único de escuta e reflexão, onde cada pessoa pode explorar sua história com liberdade e sem julgamentos.\n\nPor meio de um processo contínuo e colaborativo, é possível compreender melhor os próprios sentimentos, identificar padrões que se repetem e construir novas formas de lidar com os desafios do dia a dia.\n\nO trabalho terapêutico não segue um roteiro fixo — ele se adapta ao ritmo e às necessidades de cada pessoa, respeitando sua singularidade e seu tempo.\n\nBuscar terapia é um ato de coragem e cuidado consigo mesmo. Se você sente que chegou o momento de dar esse passo, estou aqui para caminhar junto com você.`,
 }));
+
+export function getArticleByPath(pathname: string): Article | undefined {
+  const match = pathname.match(/^\/conteudos\/([^/]+)\/([^/]+)\/?$/);
+  if (!match) return undefined;
+  const [, categorySlug, slug] = match;
+  return ARTICLES.find(a => a.categorySlug === categorySlug && a.slug === slug);
+}
 
 function Label({ children, variant = "outline", align = "start", className = "" }: {
   children: React.ReactNode;
@@ -553,7 +566,7 @@ function ArticleCard({ article }: { article: Article }) {
     >
       <div className="flex flex-col rounded-[20px] overflow-hidden bg-[#F8EDE4] border border-[rgba(9,37,41,0.04)]">
         <div className="h-[196px] md:h-[220px] lg:h-[196px] overflow-hidden shrink-0">
-          <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+          <img src={article.image} alt={article.title} width={640} height={440} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
         </div>
         <div className="flex flex-col gap-4 p-6 flex-1">
           <div className="flex items-center gap-1.5" style={{ color: muted }}>
@@ -708,7 +721,7 @@ function SmallCard({ article }: { article: Article }) {
   return (
     <Link to={`/conteudos/${article.categorySlug}/${article.slug}`} className="group flex gap-4 items-start">
       <div className="w-[88px] h-[88px] md:w-[96px] md:h-[96px] rounded-2xl overflow-hidden shrink-0 border border-[rgba(9,37,41,0.06)]">
-        <img src={article.image} alt={article.title} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+        <img src={article.image} alt={article.title} width={640} height={440} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
       </div>
       <div className="flex flex-col gap-2 flex-1 min-w-0 pt-0.5">
         <span className="inline-flex items-center gap-1.5 font-['Noto_Sans',sans-serif] text-[11px] font-semibold uppercase tracking-[0.12em] text-[rgba(9,37,41,0.45)]">
@@ -724,6 +737,30 @@ function SmallCard({ article }: { article: Article }) {
 }
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
+const IS_SSR = import.meta.env.SSR;
+
+function MotionBox({
+  children,
+  className = "",
+  initial,
+  animate,
+  transition,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  initial?: object | false;
+  animate?: object;
+  transition?: object;
+}) {
+  if (IS_SSR) {
+    return <div className={className}>{children}</div>;
+  }
+  return (
+    <motion.div className={className} initial={initial} animate={animate} transition={transition}>
+      {children}
+    </motion.div>
+  );
+}
 
 function Reveal({
   children, delay = 0, className = "", y = 24, x = 0,
@@ -734,6 +771,9 @@ function Reveal({
   y?: number;
   x?: number;
 }) {
+  if (IS_SSR) {
+    return <div className={className}>{children}</div>;
+  }
   return (
     <motion.div
       initial={{ opacity: 0, y, x }}
@@ -768,40 +808,40 @@ function CTABanner() {
   );
 }
 
-const FAQS = [
-  { q: "O que é psicanálise e como ela funciona?", a: "A psicanálise é uma abordagem terapêutica baseada na escuta e na reflexão sobre a história, os sentimentos e as experiências de cada sujeito. O processo busca compreender os significados que existem por trás de sintomas, conflitos emocionais e padrões que se repetem ao longo da vida." },
-  { q: "Como saber se preciso de terapia?", a: "Não é necessário estar em uma crise para procurar ajuda psicológica. A terapia pode ser indicada quando existe sofrimento emocional, ansiedade, dificuldades nos relacionamentos, baixa autoestima ou simplesmente o desejo de compreender melhor a si mesmo." },
-  { q: "Como funciona a terapia online?", a: "As sessões acontecem por videochamada, em um ambiente seguro e sigiloso. O atendimento online permite que pessoas de Salvador, da Bahia, de todo o Brasil e brasileiros que vivem no exterior tenham acesso à psicoterapia com praticidade e conforto." },
-  { q: "O que acontece na primeira sessão?", a: "A primeira sessão é um espaço para conversar sobre o que motivou sua busca por terapia, esclarecer dúvidas e compreender como o processo terapêutico pode ser construído de acordo com suas necessidades e momento de vida." },
-  { q: "O que diferencia a psicanálise de outras formas de terapia?", a: "A psicanálise busca compreender os significados que existem por trás dos sintomas, conflitos emocionais e padrões que se repetem na vida de cada pessoa. Mais do que oferecer respostas prontas, ela convida à reflexão e ao autoconhecimento." },
-];
+const FAQS: FAQItem[] = HOMEPAGE_FAQS;
 
-function FAQAccordion({ items, className = "" }: { items: { q: string; a: string }[]; className?: string }) {
+function FAQAccordion({ items, className = "" }: { items: FAQItem[]; className?: string }) {
   const [open, setOpen] = useState<number | null>(null);
+  const baseId = useRef(`faq-${Math.random().toString(36).slice(2, 9)}`).current;
   return (
     <div className={`flex flex-col divide-y divide-[rgba(9,37,41,0.08)] ${className}`}>
-      {items.map((faq, i) => (
+      {items.map((faq, i) => {
+        const panelId = `${baseId}-panel-${i}`;
+        const isOpen = open === i;
+        return (
         <div key={faq.q}>
           <button
             type="button"
-            onClick={() => setOpen(open === i ? null : i)}
-            aria-expanded={open === i}
+            id={`${baseId}-button-${i}`}
+            onClick={() => setOpen(isOpen ? null : i)}
+            aria-expanded={isOpen}
+            aria-controls={panelId}
             className="w-full flex items-start justify-between gap-6 py-6 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#092529] focus-visible:ring-offset-2 focus-visible:rounded-lg"
           >
-            <span className={`font-['Noto_Sans',sans-serif] font-bold text-[16px] leading-[1.5] transition-colors ${open === i ? "text-[#092529]" : "text-[#3a5254] group-hover:text-[#092529]"}`}>
+            <span className={`font-['Noto_Sans',sans-serif] font-bold text-[16px] leading-[1.5] transition-colors ${isOpen ? "text-[#092529]" : "text-[#3a5254] group-hover:text-[#092529]"}`}>
               {faq.q}
             </span>
-            <span className={`shrink-0 mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${open === i ? "bg-[#AFD7BF]" : "bg-[rgba(9,37,41,0.06)] group-hover:bg-[rgba(9,37,41,0.1)]"}`}>
-              {open === i ? <Minus size={14} color={dark} /> : <Plus size={14} color="#576264" />}
+            <span className={`shrink-0 mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isOpen ? "bg-[#AFD7BF]" : "bg-[rgba(9,37,41,0.06)] group-hover:bg-[rgba(9,37,41,0.1)]"}`} aria-hidden="true">
+              {isOpen ? <Minus size={14} color={dark} /> : <Plus size={14} color="#576264" />}
             </span>
           </button>
-          {open === i && (
-            <div className="pb-6">
+          {isOpen && (
+            <div id={panelId} role="region" aria-labelledby={`${baseId}-button-${i}`} className="pb-6">
               <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.65)] text-[15px] leading-[1.75] lg:max-w-[600px]">{faq.a}</p>
             </div>
           )}
         </div>
-      ))}
+      );})}
     </div>
   );
 }
@@ -848,16 +888,12 @@ function BenefitCard({ Icon, title, desc }: { Icon: React.ElementType; title: st
 function HomePage() {
   return (
     <>
-      <SEOHead
-        title="Psicólogo Online em Salvador | Atendimento Psicológico Online"
-        description="Breno, psicólogo clínico em Salvador, oferece atendimento psicológico online para adultos em todo o Brasil. Psicanálise, ansiedade, autoestima e relacionamentos."
-        canonical="/"
-      />
+      <SEOHead pathname="/" />
       {/* Hero */}
       <section className={`w-full bg-[#FFF7F2] pt-5 pb-6 md:pt-14 md:pb-20 lg:pt-16 lg:pb-28`}>
         <div className={`mx-auto max-w-[1280px] ${sectionPad}`}>
           <div className={`${splitRow} flex-col-reverse max-md:gap-4`}>
-            <motion.div
+            <MotionBox
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: easeOut, delay: 0.1 }}
@@ -877,15 +913,15 @@ function HomePage() {
                 <WhatsAppIcon size={16} className="text-current" />Agendar consulta
               </a>
               <HeroHighlights />
-            </motion.div>
-            <motion.div
+            </MotionBox>
+            <MotionBox
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: easeOut }}
               className={heroImage}
             >
-              <img src={imgHero} alt="Breno, psicólogo clínico" className="w-full h-full object-cover object-[center_20%]" />
-            </motion.div>
+              <img src={imgHero} alt="Breno, psicólogo clínico" width={1201} height={1309} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-[center_20%]" />
+            </MotionBox>
           </div>
         </div>
       </section>
@@ -895,7 +931,7 @@ function HomePage() {
         <div className={`mx-auto max-w-[1280px] ${sectionPad}`}>
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-10 md:gap-12 lg:gap-20">
             <Reveal className={aboutImage} x={-20}>
-              <img src={imgAbout} alt="Breno Psicólogo" className="w-full h-full object-cover" />
+              <img src={imgAbout} alt="Breno Psicólogo" width={800} height={1000} loading="lazy" decoding="async" className="w-full h-full object-cover" />
             </Reveal>
             <Reveal className="flex flex-col gap-6 flex-1 min-w-0" delay={0.15}>
               <Label><User size={12} />Sobre mim</Label>
@@ -937,7 +973,7 @@ function HomePage() {
             ].map(({ Icon, title, desc }, i) => (
               <motion.div
                 key={title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={IS_SSR ? false : { opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.65, ease: easeOut, delay: i * 0.1 }}
@@ -970,7 +1006,7 @@ function HomePage() {
               <BenefitCard Icon={Lightbulb}     title="Compreender seus sentimentos" desc="Mais clareza sobre emoções, conflitos e situações que se repetem na vida." />
             </Reveal>
             <Reveal className="rounded-3xl overflow-hidden h-64 md:h-auto md:min-h-[280px] lg:min-h-[320px]" delay={0.1}>
-              <img src={imgBenefits} alt="Benefícios" className="w-full h-full object-cover object-[70%_28%]" />
+              <img src={imgBenefits} alt="Benefícios da psicoterapia" width={800} height={600} loading="lazy" decoding="async" className="w-full h-full object-cover object-[70%_28%]" />
             </Reveal>
             <Reveal className="flex flex-col gap-4" delay={0.2}>
               <BenefitCard Icon={RefreshCw} title="Dar sentido à sua história"     desc="Um olhar mais profundo sobre vivências que influenciam escolhas e relações." />
@@ -985,7 +1021,7 @@ function HomePage() {
         <div className={`mx-auto max-w-[1280px] ${sectionPad} flex flex-col gap-10`}>
           <div className={splitRow}>
             <Reveal className={processImage} x={-20}>
-              <img src={imgProcess} alt="Como funciona o atendimento" className="w-full h-full object-cover" />
+              <img src={imgProcess} alt="Como funciona o atendimento psicológico online" width={800} height={680} loading="lazy" decoding="async" className="w-full h-full object-cover" />
             </Reveal>
             <Reveal className="flex flex-col gap-8 md:gap-9 lg:gap-10 w-full lg:w-[500px] xl:w-[540px] shrink-0" delay={0.15}>
               <div className="flex flex-col gap-4">
@@ -1216,11 +1252,7 @@ function BlogHubPage() {
   };
   return (
     <>
-      <SEOHead
-        title="Conteúdos sobre Saúde Mental e Psicologia"
-        description="Artigos sobre terapia, ansiedade, psicanálise, autoestima e relacionamentos escritos por Breno, psicólogo clínico em Salvador."
-        canonical="/conteudos"
-      />
+      <SEOHead pathname="/conteudos" />
       <section className="w-full bg-[#FFF7F2] border-b border-[rgba(9,37,41,0.07)]">
         <div className={`mx-auto max-w-[1280px] ${sectionPad} py-8 md:py-10 lg:py-12`}>
           <nav className="flex items-center gap-2 flex-wrap" aria-label="Localização">
@@ -1228,7 +1260,7 @@ function BlogHubPage() {
             <Sep />
             <span className="font-['Noto_Sans',sans-serif] text-[13px] font-semibold text-[#092529]">Conteúdos</span>
           </nav>
-          <motion.div
+          <MotionBox
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: easeOut, delay: 0.05 }}
@@ -1311,7 +1343,7 @@ function BlogHubPage() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </MotionBox>
         </div>
       </section>
       <section className={`w-full bg-[#FFF7F2] py-14 md:py-20 lg:py-24`}>
@@ -1359,11 +1391,7 @@ function CategoryPage() {
   if (!cat) return <NotFoundPage />;
   return (
     <>
-      <SEOHead
-        title={`${cat.name} — Artigos e Conteúdos sobre ${cat.name}`}
-        description={cat.description}
-        canonical={`/conteudos/${cat.slug}`}
-      />
+      <SEOHead pathname={`/conteudos/${cat.slug}`} />
       <section className="w-full bg-[#FFF7F2] border-b border-[rgba(9,37,41,0.07)]">
         <div className={`mx-auto max-w-[1280px] ${sectionPad} py-8 md:py-10 lg:py-12`}>
           <nav className="flex items-center gap-2 flex-wrap" aria-label="Localização">
@@ -1374,7 +1402,7 @@ function CategoryPage() {
             <span className="font-['Noto_Sans',sans-serif] text-[13px] font-semibold text-[#092529]">{cat.name}</span>
           </nav>
 
-          <motion.div
+          <MotionBox
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: easeOut, delay: 0.05 }}
@@ -1418,6 +1446,10 @@ function CategoryPage() {
                   <img
                     src={articles[0].image}
                     alt={articles[0].title}
+                    width={800}
+                    height={500}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[rgba(9,37,41,0.72)] via-[rgba(9,37,41,0.18)] to-transparent" />
@@ -1435,7 +1467,7 @@ function CategoryPage() {
                 </Link>
               )}
             </div>
-          </motion.div>
+          </MotionBox>
         </div>
       </section>
       <section className={`w-full bg-[#FFF7F2] py-14 md:py-20 lg:py-24`}>
@@ -1623,7 +1655,7 @@ function renderArticleBlock(block: ArticleBlock, key: number) {
       return (
         <figure key={key} className="overflow-hidden rounded-3xl border border-[rgba(9,37,41,0.08)] shadow-[0_12px_40px_rgba(9,37,41,0.08)]">
           <div className="aspect-[16/10] md:aspect-[21/10]">
-            <img src={block.src} alt={block.alt} className="size-full object-cover" />
+            <img src={block.src} alt={block.alt} width={800} height={500} loading="lazy" decoding="async" className="size-full object-cover" />
           </div>
           {block.caption && (
             <figcaption className="px-5 py-4 md:px-6 font-['Noto_Sans',sans-serif] text-[13px] leading-[1.6] text-[rgba(9,37,41,0.55)] bg-[#F8EDE4]">
@@ -1867,14 +1899,7 @@ function ArticlePage() {
 
   return (
     <>
-      <SEOHead
-        title={article.title}
-        description={article.excerpt}
-        canonical={`/conteudos/${category}/${slug}`}
-        type="article"
-        section={article.category}
-        publishedTime={article.date}
-      />
+      <SEOHead pathname={`/conteudos/${category}/${slug}`} article={article} />
 
       <section className="w-full bg-[#FFF7F2] border-b border-[rgba(9,37,41,0.07)]">
         <div className={`mx-auto max-w-[1280px] ${sectionPad} py-8 md:py-10 lg:py-12`}>
@@ -1887,7 +1912,7 @@ function ArticlePage() {
           </nav>
 
           <div className="mt-6 md:mt-8 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] gap-8 lg:gap-10 items-start">
-            <motion.div
+            <MotionBox
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, ease: easeOut, delay: 0.05 }}
@@ -1906,7 +1931,7 @@ function ArticlePage() {
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#AFD7BF] shrink-0">
-                    <img src={imgAbout} alt="Breno, psicólogo" className="w-full h-full object-cover" />
+                    <img src={imgAbout} alt="Breno Vieira, psicólogo clínico" width={80} height={80} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <p className="font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[13px] leading-none">Breno</p>
@@ -1942,17 +1967,17 @@ function ArticlePage() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </MotionBox>
 
-            <motion.div
+            <MotionBox
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.65, ease: easeOut, delay: 0.15 }}
               className="relative rounded-3xl overflow-hidden aspect-[16/10] lg:aspect-auto lg:h-[min(100%,320px)] lg:min-h-[280px] border border-[rgba(9,37,41,0.06)] shadow-[0_16px_48px_rgba(9,37,41,0.1)]"
             >
-              <img src={article.image} alt={article.title} className="absolute inset-0 size-full object-cover" />
+              <img src={article.image} alt={article.title} width={800} height={500} loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 size-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(9,37,41,0.25)] to-transparent pointer-events-none" />
-            </motion.div>
+            </MotionBox>
           </div>
         </div>
       </section>
@@ -1990,7 +2015,7 @@ function ArticlePage() {
 
               <div className="mt-10 md:mt-12 border-t border-[rgba(9,37,41,0.08)] pt-10 flex flex-col sm:flex-row gap-5 items-start">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#AFD7BF] shrink-0">
-                  <img src={imgAbout} alt="Breno, psicólogo" className="w-full h-full object-cover" />
+                  <img src={imgAbout} alt="Breno Vieira, psicólogo clínico" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex flex-col gap-2 min-w-0">
                   <p className="font-['Merriweather',serif] font-bold text-[#092529] text-[18px]">Breno — Psicólogo Clínico</p>
@@ -2062,23 +2087,27 @@ function ArticlePage() {
 
 function NotFoundPage() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: easeOut }}
-      className="flex flex-col items-center justify-center min-h-[60vh] gap-8 px-6 text-center bg-[#FFF7F2]"
-    >
-      <p className="font-['Merriweather',serif] font-bold text-[rgba(9,37,41,0.08)] text-[120px] leading-none select-none">404</p>
-      <div className="flex flex-col gap-3 -mt-12">
-        <h1 className="font-['Merriweather',serif] font-bold text-[#092529] text-[30px]">Página não encontrada</h1>
-        <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.5)] text-[16px]">O conteúdo que você procura não existe ou foi movido.</p>
-      </div>
-      <button onClick={() => navigate("/")}
-        className={`${ctaBtn} gap-2 bg-[#AFD7BF] hover:bg-[#9DCAAF] px-7 py-4 rounded-2xl font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[15px] transition-colors`}>
-        <ChevronLeft size={15} />Voltar para o início
-      </button>
-    </motion.div>
+    <>
+      <SEOHead pathname={pathname} noindex />
+      <MotionBox
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: easeOut }}
+        className="flex flex-col items-center justify-center min-h-[60vh] gap-8 px-6 text-center bg-[#FFF7F2]"
+      >
+        <p className="font-['Merriweather',serif] font-bold text-[rgba(9,37,41,0.08)] text-[120px] leading-none select-none" aria-hidden="true">404</p>
+        <div className="flex flex-col gap-3 -mt-12">
+          <h1 className="font-['Merriweather',serif] font-bold text-[#092529] text-[30px]">Página não encontrada</h1>
+          <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.5)] text-[16px]">O conteúdo que você procura não existe ou foi movido.</p>
+        </div>
+        <button onClick={() => navigate("/")}
+          className={`${ctaBtn} gap-2 bg-[#AFD7BF] hover:bg-[#9DCAAF] px-7 py-4 rounded-2xl font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[15px] transition-colors`}>
+          <ChevronLeft size={15} />Voltar para o início
+        </button>
+      </MotionBox>
+    </>
   );
 }
 
@@ -2097,74 +2126,31 @@ function ScrollReset() {
 }
 
 function SEOHead({
-  title,
-  description,
-  canonical,
-  type = "website",
-  section,
-  publishedTime,
+  pathname,
+  article,
+  noindex = false,
 }: {
-  title: string;
-  description: string;
-  canonical: string;
-  type?: "website" | "article";
-  section?: string;
-  publishedTime?: string;
+  pathname: string;
+  article?: Article;
+  noindex?: boolean;
 }) {
   useEffect(() => {
-    const siteName = "Breno Psicólogo | Atendimento Online";
-    document.title = title ? `${title} | ${siteName}` : siteName;
-    const setMeta = (name: string, content: string) => {
-      let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
-      if (!el) { el = document.createElement("meta"); el.name = name; document.head.appendChild(el); }
-      el.content = content;
-    };
-    const setProp = (prop: string, content: string) => {
-      let el = document.querySelector(`meta[property="${prop}"]`) as HTMLMetaElement;
-      if (!el) { el = document.createElement("meta"); el.setAttribute("property", prop); document.head.appendChild(el); }
-      el.content = content;
-    };
-    setMeta("description", description);
-    setMeta("robots", "index, follow");
-    setProp("og:title", document.title);
-    setProp("og:description", description);
-    setProp("og:type", type);
-    setProp("og:site_name", "Breno Psicólogo");
-    const base = SITE_BASE;
-    setProp("og:url", `${base}${canonical}`);
-    setProp("og:locale", "pt_BR");
-    if (type === "article") {
-      setProp("article:section", section ?? "");
-      if (publishedTime) setProp("article:published_time", publishedTime);
-    }
-    let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
-    link.href = `${base}${canonical}`;
-
-    const scriptId = "article-jsonld";
-    const existing = document.getElementById(scriptId);
-    if (type === "article") {
-      const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        headline: title,
-        description,
-        url: `${base}${canonical}`,
-        inLanguage: "pt-BR",
-        author: { "@type": "Person", name: "Breno", jobTitle: "Psicólogo Clínico" },
-        publisher: { "@type": "Organization", name: "Breno Psicólogo" },
-        articleSection: section,
-        datePublished: publishedTime,
-      };
-      const script = existing ?? document.createElement("script");
-      script.id = scriptId;
-      script.type = "application/ld+json";
-      script.textContent = JSON.stringify(jsonLd);
-      if (!existing) document.head.appendChild(script);
-    } else if (existing) {
-      existing.remove();
-    }
-  }, [title, description, canonical, type, section, publishedTime]);
+    const seo = getPageSEO(pathname, {
+      noindex,
+      article: article
+        ? {
+            title: article.title,
+            excerpt: article.excerpt,
+            category: article.category,
+            categorySlug: article.categorySlug,
+            slug: article.slug,
+            date: article.date,
+            image: article.image,
+          }
+        : undefined,
+    });
+    injectHeadTags(seo);
+  }, [pathname, article, noindex]);
   return null;
 }
 
@@ -2199,7 +2185,7 @@ function StickyCtaBar() {
   );
 }
 
-function Layout() {
+export function AppLayout() {
   useEffect(() => {
     document.documentElement.lang = "pt-BR";
 
@@ -2255,7 +2241,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <BrowserRouter>
-        <Layout />
+        <AppLayout />
       </BrowserRouter>
     </MotionConfig>
   );

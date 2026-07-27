@@ -38,6 +38,10 @@ export default defineConfig(({ isSsrBuild }) => ({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    modulePreload: {
+      resolveDependencies: (_filename, deps) =>
+        deps.filter((dep) => !/(?:^|\/)motion-|^ui-/.test(dep.split('/').pop() ?? dep)),
+    },
     rollupOptions: isSsrBuild
       ? {}
       : {

@@ -2,28 +2,21 @@
 export function extractLcpPreloadHTML(html) {
   const tags = [];
 
-  const mobileMatch = html.match(/media="\(max-width: 768px\)" srcSet="([^"]+)"/);
-  const highPriorityMatch =
+  const mobileMatch =
     html.match(/fetchPriority="high"[^>]*\ssrc="([^"]+)"/)
     ?? html.match(/\ssrc="([^"]+)"[^>]*fetchPriority="high"/);
+  const desktopMatch = html.match(/media="\(min-width: 769px\)" srcSet="([^"]+)"/);
 
   if (mobileMatch) {
     tags.push(
-      `<link rel="preload" as="image" type="image/webp" href="${mobileMatch[1]}" media="(max-width: 768px)" fetchpriority="high" />`,
+      `<link rel="preload" as="image" type="image/webp" href="${mobileMatch[1]}" fetchpriority="high" />`,
     );
   }
 
-  if (highPriorityMatch) {
-    const href = highPriorityMatch[1];
-    if (mobileMatch) {
-      tags.push(
-        `<link rel="preload" as="image" type="image/webp" href="${href}" media="(min-width: 769px)" fetchpriority="high" />`,
-      );
-    } else {
-      tags.push(
-        `<link rel="preload" as="image" type="image/webp" href="${href}" fetchpriority="high" />`,
-      );
-    }
+  if (desktopMatch) {
+    tags.push(
+      `<link rel="preload" as="image" type="image/webp" href="${desktopMatch[1]}" media="(min-width: 769px)" fetchpriority="high" />`,
+    );
   }
 
   return tags.length ? `\n    ${tags.join("\n    ")}` : "";
@@ -33,10 +26,10 @@ export function extractLcpPreloadHTML(html) {
 export function injectLcpPreloads(html) {
   document.querySelectorAll("link[data-lcp-preload]").forEach((node) => node.remove());
 
-  const mobileMatch = html.match(/media="\(max-width: 768px\)" srcSet="([^"]+)"/);
-  const highPriorityMatch =
+  const mobileMatch =
     html.match(/fetchPriority="high"[^>]*\ssrc="([^"]+)"/)
     ?? html.match(/\ssrc="([^"]+)"[^>]*fetchPriority="high"/);
+  const desktopMatch = html.match(/media="\(min-width: 769px\)" srcSet="([^"]+)"/);
 
   const add = (href, media) => {
     const link = document.createElement("link");
@@ -50,11 +43,6 @@ export function injectLcpPreloads(html) {
     document.head.appendChild(link);
   };
 
-  if (mobileMatch) add(mobileMatch[1], "(max-width: 768px)");
-  if (highPriorityMatch) {
-    add(
-      highPriorityMatch[1],
-      mobileMatch ? "(min-width: 769px)" : undefined,
-    );
-  }
+  if (mobileMatch) add(mobileMatch[1]);
+  if (desktopMatch) add(desktopMatch[1], mobileMatch ? "(min-width: 769px)" : undefined);
 }

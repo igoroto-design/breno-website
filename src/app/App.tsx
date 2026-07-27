@@ -221,12 +221,12 @@ export function getArticleByPath(pathname: string): Article | undefined {
 function HeroImage({ className = "" }: { className?: string }) {
   return (
     <picture className={`block size-full ${className}`.trim()}>
-      <source media="(max-width: 768px)" srcSet={imgHeroMobile} type="image/webp" />
+      <source media="(min-width: 769px)" srcSet={imgHero} type="image/webp" />
       <img
-        src={imgHero}
+        src={imgHeroMobile}
         alt="Breno, psicólogo clínico"
-        width={1201}
-        height={1309}
+        width={720}
+        height={784}
         loading="eager"
         fetchPriority="high"
         decoding="async"

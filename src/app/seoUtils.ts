@@ -455,7 +455,7 @@ export function injectLcpPreloadsFromUrls(mobile?: string, desktop?: string) {
     document.head.appendChild(link);
   };
 
-  if (mobile) add(mobile, "(max-width: 768px)");
+  if (mobile) add(mobile);
   if (desktop) add(desktop, mobile ? "(min-width: 769px)" : undefined);
 }
 

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import imgHero            from "../assets/breno-psicologo-hero.webp";
+import imgHeroMobile      from "../assets/breno-psicologo-hero-mobile.webp";
 import imgAbout           from "../assets/breno-psicologo-sobre.webp";
 import imgBenefits        from "../assets/beneficios-psicoterapia.webp";
 import imgProcess         from "../assets/como-funciona-atendimento.webp";
@@ -46,6 +47,7 @@ import { SITE_BASE } from "./siteConfig";
 import {
   getPageSEO,
   injectHeadTags,
+  injectLcpPreloadsFromUrls,
   HOMEPAGE_FAQS,
   type FAQItem,
 } from "./seoUtils";
@@ -214,6 +216,24 @@ export function getArticleByPath(pathname: string): Article | undefined {
   if (!match) return undefined;
   const [, categorySlug, slug] = match;
   return ARTICLES.find(a => a.categorySlug === categorySlug && a.slug === slug);
+}
+
+function HeroImage({ className = "" }: { className?: string }) {
+  return (
+    <picture className={`block size-full ${className}`.trim()}>
+      <source media="(max-width: 768px)" srcSet={imgHeroMobile} type="image/webp" />
+      <img
+        src={imgHero}
+        alt="Breno, psicólogo clínico"
+        width={1201}
+        height={1309}
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className="w-full h-full object-cover object-[center_20%]"
+      />
+    </picture>
+  );
 }
 
 function Label({ children, variant = "outline", align = "start", className = "" }: {
@@ -920,7 +940,7 @@ function HomePage() {
               transition={{ duration: 0.8, ease: easeOut }}
               className={heroImage}
             >
-              <img src={imgHero} alt="Breno, psicólogo clínico" width={1201} height={1309} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover object-[center_20%]" />
+              <HeroImage />
             </MotionBox>
           </div>
         </div>
@@ -2150,6 +2170,14 @@ function SEOHead({
         : undefined,
     });
     injectHeadTags(seo);
+
+    if (pathname === "/") {
+      injectLcpPreloadsFromUrls(imgHeroMobile, imgHero);
+    } else if (article?.image) {
+      injectLcpPreloadsFromUrls(undefined, article.image);
+    } else {
+      document.querySelectorAll("link[data-lcp-preload]").forEach((node) => node.remove());
+    }
   }, [pathname, article, noindex]);
   return null;
 }
@@ -2189,25 +2217,36 @@ export function AppLayout() {
   useEffect(() => {
     document.documentElement.lang = "pt-BR";
 
-    const lenis = new Lenis({
-      duration: 1.4,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      touchMultiplier: 1.5,
-      infinite: false,
-    });
-    __lenis = lenis;
+    let lenis: Lenis | null = null;
+    let rafId = 0;
 
-    let rafId: number;
-    const raf = (time: number) => {
-      lenis.raf(time);
+    const initLenis = () => {
+      lenis = new Lenis({
+        duration: 1.4,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        touchMultiplier: 1.5,
+        infinite: false,
+      });
+      __lenis = lenis;
+
+      const raf = (time: number) => {
+        lenis?.raf(time);
+        rafId = requestAnimationFrame(raf);
+      };
       rafId = requestAnimationFrame(raf);
     };
-    rafId = requestAnimationFrame(raf);
+
+    if (document.readyState === "complete") {
+      initLenis();
+    } else {
+      window.addEventListener("load", initLenis, { once: true });
+    }
 
     return () => {
+      window.removeEventListener("load", initLenis);
       cancelAnimationFrame(rafId);
-      lenis.destroy();
+      lenis?.destroy();
       __lenis = null;
     };
   }, []);

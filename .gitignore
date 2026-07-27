@@ -27,6 +27,3 @@ yarn-error.log*
 
 # Claude Code session files
 .claude/
-
-# Scripts (not needed in production)
-scripts/

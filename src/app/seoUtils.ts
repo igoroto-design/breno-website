@@ -440,6 +440,25 @@ function escapeAttr(value: string): string {
   return escapeHtml(value).replace(/"/g, "&quot;");
 }
 
+export function injectLcpPreloadsFromUrls(mobile?: string, desktop?: string) {
+  document.querySelectorAll("link[data-lcp-preload]").forEach((node) => node.remove());
+
+  const add = (href: string, media?: string) => {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.type = "image/webp";
+    link.href = href;
+    link.fetchPriority = "high";
+    link.dataset.lcpPreload = "true";
+    if (media) link.media = media;
+    document.head.appendChild(link);
+  };
+
+  if (mobile) add(mobile, "(max-width: 768px)");
+  if (desktop) add(desktop, mobile ? "(min-width: 769px)" : undefined);
+}
+
 export function isKnownCategory(slug: string): boolean {
   return (CATEGORY_SLUGS as readonly string[]).includes(slug);
 }

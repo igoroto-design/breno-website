@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && vite build --ssr src/ssr/entry-server.tsx --outDir dist/server && node scripts/prerender.mjs && node scripts/optimize-images.mjs && node scripts/generate-404.mjs && node scripts/generate-sitemap.mjs && rm -rf dist/server",
+    "dev": "node scripts/generate-mobile-images.mjs && vite",
+    "build": "node scripts/generate-mobile-images.mjs && vite build && vite build --ssr src/ssr/entry-server.tsx --outDir dist/server && node scripts/prerender.mjs && node scripts/optimize-images.mjs && node scripts/generate-404.mjs && node scripts/generate-sitemap.mjs && rm -rf dist/server",
     "preview": "vite preview"
   },
   "dependencies": {

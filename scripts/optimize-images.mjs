@@ -15,7 +15,6 @@ try {
 }
 
 const IMAGE_EXT = new Set([".webp", ".jpg", ".jpeg", ".png"]);
-const MAX_WIDTH = 1280;
 const WEBP_QUALITY = 78;
 
 function walk(dir) {
@@ -39,7 +38,10 @@ if (!statSync(assetsDir, { throwIfNoEntry: false })) {
 const images = walk(assetsDir).filter((f) => IMAGE_EXT.has(extname(f).toLowerCase()));
 let saved = 0;
 
+const MAX_WIDTH = 1280;
+
 for (const file of images) {
+  if (file.endsWith(".avif")) continue;
   const before = statSync(file).size;
   const input = readFileSync(file);
   const image = sharp(input);

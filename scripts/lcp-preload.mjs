@@ -2,14 +2,12 @@
 export function extractLcpPreloadHTML(html) {
   const tags = [];
 
-  const mobileMatch =
-    html.match(/fetchPriority="high"[^>]*\ssrc="([^"]+)"/)
-    ?? html.match(/\ssrc="([^"]+)"[^>]*fetchPriority="high"/);
+  const mobileMatch = html.match(/media="\(max-width: 768px\)"[^>]*srcSet="([^"]+\.webp)"/);
   const desktopMatch = html.match(/media="\(min-width: 769px\)" srcSet="([^"]+)"/);
 
   if (mobileMatch) {
     tags.push(
-      `<link rel="preload" as="image" type="image/webp" href="${mobileMatch[1]}" fetchpriority="high" />`,
+      `<link rel="preload" as="image" type="image/webp" href="${mobileMatch[1]}" media="(max-width: 768px)" fetchpriority="high" />`,
     );
   }
 
@@ -26,9 +24,7 @@ export function extractLcpPreloadHTML(html) {
 export function injectLcpPreloads(html) {
   document.querySelectorAll("link[data-lcp-preload]").forEach((node) => node.remove());
 
-  const mobileMatch =
-    html.match(/fetchPriority="high"[^>]*\ssrc="([^"]+)"/)
-    ?? html.match(/\ssrc="([^"]+)"[^>]*fetchPriority="high"/);
+  const mobileMatch = html.match(/media="\(max-width: 768px\)"[^>]*srcSet="([^"]+\.webp)"/);
   const desktopMatch = html.match(/media="\(min-width: 769px\)" srcSet="([^"]+)"/);
 
   const add = (href, media) => {
@@ -43,6 +39,6 @@ export function injectLcpPreloads(html) {
     document.head.appendChild(link);
   };
 
-  if (mobileMatch) add(mobileMatch[1]);
+  if (mobileMatch) add(mobileMatch[1], "(max-width: 768px)");
   if (desktopMatch) add(desktopMatch[1], mobileMatch ? "(min-width: 769px)" : undefined);
 }

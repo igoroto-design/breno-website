@@ -1,6 +1,16 @@
-export const SITE_BASE = "https://brenovieirapsi.com";
+export const SITE_BASE = "https://www.brenovieirapsi.com";
 export const SITE_NAME = "Breno Psicólogo";
+export const PERSON_PATH = "/sobre";
+export const PERSON_URL = `${SITE_BASE}${PERSON_PATH}`;
 export const DEFAULT_OG_IMAGE = `${SITE_BASE}/og-image.jpg`;
+export const OG_IMAGE_WIDTH = 1200;
+export const OG_IMAGE_HEIGHT = 630;
+export const GOOGLE_BUSINESS_URL = "https://share.google/WhHQEJ8Lu3lCTtAAF";
+/** Public profile URLs for Person schema sameAs */
+export const SOCIAL_PROFILES = [
+  GOOGLE_BUSINESS_URL,
+  "https://www.google.com/search?kgmid=/g/11zcnpd3gw&q=Breno+Vieira+Psic%C3%B3logo",
+];
 
 export const CATEGORY_SLUGS = [
   "psicoterapia",
@@ -22,11 +32,11 @@ export const ARTICLE_LASTMOD = {
   "ansiedade/ansiedade-e-insonia": "2025-06-05",
   "ansiedade/pensamentos-acelerados": "2025-06-01",
   "ansiedade/ansiedade-sintomas-fisicos": "2025-05-25",
-  "psicanalise/o-que-e-psicanalise": "2025-06-15",
+  "psicanalise/o-que-e-psicanalise": "2026-09-14",
   "psicanalise/psicanalise-funciona": "2025-06-01",
   "psicanalise/psicanalise-vs-tcc": "2025-06-19",
   "psicanalise/psicanalise-online": "2025-06-10",
-  "psicanalise/quando-procurar-psicanalista": "2025-05-25",
+  "psicanalise/quando-procurar-psicanalista": "2026-09-14",
   "psicanalise/quanto-tempo-dura-psicanalise": "2025-06-05",
   "autoestima/autoestima-baixa-sinais": "2025-05-25",
   "autoestima/critica-interna-como-lidar": "2025-06-05",
@@ -42,6 +52,8 @@ export function getPrerenderRoutes() {
   const articleRoutes = Object.keys(ARTICLE_LASTMOD).map((key) => `/conteudos/${key}`);
   return [
     "/",
+    "/sobre",
+    "/politica-de-privacidade",
     "/conteudos",
     ...CATEGORY_SLUGS.map((slug) => `/conteudos/${slug}`),
     ...articleRoutes,

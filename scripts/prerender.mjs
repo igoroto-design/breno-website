@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { getPrerenderRoutes } from "./site-routes.mjs";
@@ -7,9 +7,10 @@ import { extractLcpPreloadHTML } from "./lcp-preload.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const distDir = join(root, "dist");
+const assetsDir = join(distDir, "assets");
 const serverPath = join(distDir, "server", "entry-server.js");
 
-const { render, getSEO, buildHeadHTML } = await import(pathToFileURL(serverPath).href);
+const { render, getSEO, buildMetaHTML, buildJsonLdHTML } = await import(pathToFileURL(serverPath).href);
 
 const warn = console.warn;
 const error = console.error;
@@ -25,16 +26,44 @@ console.error = (...args) => {
 const template = readFileSync(join(distDir, "index.html"), "utf-8");
 const routes = getPrerenderRoutes();
 
-function injectHtml(templateHtml, routeHtml, headHtml) {
+const VIEWPORT =
+  '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
+
+function extractFontPreloadHTML() {
+  try {
+    const noto = readdirSync(assetsDir).find(
+      (file) => file.includes("noto-sans-latin-400-normal") && file.endsWith(".woff2"),
+    );
+    if (!noto) return "";
+    return `<link rel="preload" href="/assets/${noto}" as="font" type="font/woff2" crossorigin />`;
+  } catch {
+    return "";
+  }
+}
+
+function injectHtml(templateHtml, routeHtml, metaHtml, headPreloadHtml, jsonLdHtml) {
   let html = templateHtml;
 
   html = html.replace('<div id="root"></div>', `<div id="root">${routeHtml}</div>`);
 
-  // Replace default head SEO block with route-specific tags
+  if (headPreloadHtml) {
+    html = html.replace(
+      VIEWPORT,
+      `${VIEWPORT}\n    ${headPreloadHtml.trim()}`,
+    );
+  }
+
   html = html.replace(
-    /<!-- Primary meta -->[\s\S]*?<!-- Schema: Person \(professional\) -->/,
-    `<!-- Primary meta (prerendered) -->\n    ${headHtml}\n\n    <!-- Schema: Person (professional) -->`,
+    /<!-- SEO_HEAD_START -->[\s\S]*?<!-- SEO_HEAD_END -->/,
+    `<!-- SEO_HEAD_START -->\n    ${metaHtml}\n    <!-- SEO_HEAD_END -->`,
   );
+
+  if (jsonLdHtml) {
+    html = html.replace(
+      "</body>",
+      `\n    <!-- Structured data (prerendered) -->\n    ${jsonLdHtml}\n  </body>`,
+    );
+  }
 
   return html;
 }
@@ -44,11 +73,16 @@ function outputPath(route) {
   return join(distDir, route.slice(1), "index.html");
 }
 
+const fontPreload = extractFontPreloadHTML();
+
 for (const route of routes) {
-  const appHtml = render(route);
+  const appHtml = await render(route);
   const seo = getSEO(route);
-  const headHtml = buildHeadHTML(seo) + extractLcpPreloadHTML(appHtml);
-  const html = injectHtml(template, appHtml, headHtml);
+  const metaHtml = buildMetaHTML(seo);
+  const jsonLdHtml = buildJsonLdHTML(seo);
+  const lcpPreloadHtml = route === "/" ? extractLcpPreloadHTML(appHtml) : "";
+  const headPreloadHtml = [lcpPreloadHtml, route === "/" ? fontPreload : ""].filter(Boolean).join("\n    ");
+  const html = injectHtml(template, appHtml, metaHtml, headPreloadHtml, jsonLdHtml);
   const out = outputPath(route);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html, "utf-8");

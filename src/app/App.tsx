@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { motion, MotionConfig } from "motion/react";
 import useEmblaCarousel from "embla-carousel-react";
 import Lenis from "lenis";
@@ -15,7 +15,9 @@ import {
 
 import imgHero            from "../assets/breno-psicologo-hero.webp";
 import imgHeroMobile      from "../assets/breno-psicologo-hero-mobile.webp";
+import imgHeroMobileAvif  from "../assets/breno-psicologo-hero-mobile.avif";
 import imgAbout           from "../assets/breno-psicologo-sobre.webp";
+import imgAboutMobile     from "../assets/breno-psicologo-sobre-mobile.webp";
 import imgBenefits        from "../assets/beneficios-psicoterapia.webp";
 import imgProcess         from "../assets/como-funciona-atendimento.webp";
 import imgAnxietyWoman    from "../assets/mulher-ansiedade-sessao.webp";
@@ -42,50 +44,54 @@ import imgElderWomanSession2  from "../assets/mulher-idosa-psicanalise-sessao.we
 import imgManJournaling       from "../assets/homem-escrevendo-diario-terapia.webp";
 import imgQuandoPsicologo     from "../assets/quando-buscar-psicologo-sinais.webp";
 
-import { ARTICLE_BLOCKS, ARTICLE_RECOMMENDED, ARTICLE_TOC, slugifyHeading, type ArticleBlock } from "./articleBodies";
 import { SITE_BASE } from "./siteConfig";
 import {
   getPageSEO,
   injectHeadTags,
   injectLcpPreloadsFromUrls,
+  getCategoryHeading,
   HOMEPAGE_FAQS,
   type FAQItem,
 } from "./seoUtils";
+import { PrivacyPolicyPage } from "./PrivacyPolicyPage";
+import { AboutPage } from "./AboutPage";
+import { ARTICLE_CARD_IMAGES } from "../generated/article-card-images";
+import { GOOGLE_BUSINESS_URL } from "./siteConfig";
 
 const dark  = "#092529";
 const mint  = "#AFD7BF";
 const muted = "#BBABA0";
 const WA        = "https://api.whatsapp.com/send/?phone=5571997250690&text=Olá%2C+Breno%21+Tudo+bem%3F%0A%0AEstou+buscando+acompanhamento+psicológico+e+gostaria+de+saber+mais+sobre+o+seu+atendimento+online.+Vi+seu+site+e+me+identifiquei+com+a+sua+abordagem.%0A%0APoderia+me+passar+mais+informações%3F%0A%0AObrigado%28a%29%21&type=phone_number&app_absent=0";
 const ARTICLE_IMAGES = [
-  // Row 1 — man · woman · therapist pair  (homepage recent)
+  // Row 1, man · woman · therapist pair  (homepage recent)
   imgManContemplative,     // quando-procurar-psicologo
   imgAnxietyWoman,         // ansiedade-12-sintomas
   imgTherapistSupport,     // o-que-e-psicanalise
-  // Row 2 — young woman · couple · young man
+  // Row 2, young woman · couple · young man
   imgYoungWomanSession,    // autoestima-baixa-sinais
   imgCoupleSession,        // relacionamento-toxico-sinais
   imgYoungManPsicologia,   // como-saber-se-preciso-de-terapia
-  // Row 3 — woman laptop · man journaling · therapist talking
+  // Row 3, woman laptop · man journaling · therapist talking
   imgWomanGlassesLaptop,   // ansiedade-e-insonia
   imgManJournaling,        // psicanalise-funciona
   imgTherapistTalking,     // critica-interna-como-lidar
-  // Row 4 — infographic · man desk · woman tablet
+  // Row 4, infographic · man desk · woman tablet
   imgBenefits,             // medo-de-abandono
   imgManOnlineDesk,        // terapia-online-funciona
   imgWomanTabletOnline,    // pensamentos-acelerados
-  // Row 5 — woman · man expressive · woman laptop
+  // Row 5, woman · man expressive · woman laptop
   imgWomanPsicanalise,     // psicanalise-vs-tcc
   imgManBlackExpressive,   // inseguranca
   imgOnlineWomanLaptop,    // ciumes-em-excesso
-  // Row 6 — man couch · elder woman · man airpods
+  // Row 6, man couch · elder woman · man airpods
   imgManCouchLaptop,       // terapia-online-ou-presencial
   imgElderWomanSession2,   // ansiedade-sintomas-fisicos
   imgManAirpodsSession,    // psicanalise-online
-  // Row 7 — process · young man · elder woman
+  // Row 7, process · young man · elder woman
   imgProcess,              // terapia-ajuda-autoestima
   imgYoungManSession,      // dependencia-emocional
   imgElderWomanSmiling,    // como-escolher-um-psicologo
-  // Row 8 — older man · man black · elder woman
+  // Row 8, older man · man black · elder woman
   imgOlderManGlasses,      // quando-procurar-psicanalista
   imgManBlackSession,      // o-que-esperar-da-primeira-sessao
   imgElderWomanSerene,     // quanto-tempo-dura-psicanalise
@@ -143,14 +149,15 @@ const bannerTitle  = "font-['Merriweather',serif] font-bold text-[#092529] text-
 type Article = {
   slug: string; title: string; excerpt: string;
   category: string; categorySlug: string;
-  date: string; readTime: string; image: string; content: string;
+  date: string; readTime: string; image: string;
+  imageCard?: string;
 };
 type Category = { slug: string; name: string; description: string; count: number };
 
 const CATEGORIES: Category[] = [
-  { slug: "psicoterapia",         name: "Psicoterapia",    description: "Artigos sobre psicoterapia, saúde mental e o processo terapêutico.",              count: 7 },
+  { slug: "psicoterapia",         name: "Psicoterapia",    description: "Artigos sobre terapia online, a primeira sessão e como escolher um psicólogo.", count: 7 },
   { slug: "ansiedade",       name: "Ansiedade",        description: "Sintomas, causas e formas de lidar com a ansiedade no cotidiano.",                count: 4 },
-  { slug: "psicanalise",     name: "Psicanálise",      description: "Compreenda a abordagem psicanalítica e seus conceitos fundamentais.",             count: 6 },
+  { slug: "psicanalise",     name: "Psicanálise",      description: "Leituras sobre a abordagem, as sessões e o trabalho do psicanalista.",             count: 6 },
   { slug: "autoestima",      name: "Autoestima",       description: "Autoconhecimento, limites e uma relação mais saudável consigo mesmo.",            count: 4 },
   { slug: "relacionamentos", name: "Relacionamentos",  description: "Como a psicologia pode ajudar a construir vínculos mais saudáveis e duradouros.", count: 4 },
 ];
@@ -169,38 +176,38 @@ function CatIcon({ slug, size = 12 }: { slug: string; size?: number }) {
 }
 
 const RAW: [string,string,string,string,string,string,string][] = [
-  // Row 1 — terapia · ansiedade · psicanálise  (homepage recent)
-  ["quando-procurar-psicologo","Quando Procurar um Psicólogo? 12 Sinais de Que Pode Ser a Hora de Buscar Ajuda","Muitas pessoas acreditam que procurar um psicólogo é necessário apenas em momentos de crise intensa — mas isso não é verdade.","Psicoterapia","psicoterapia","25 Mai 2025","10 min a ler"],
-  ["ansiedade-12-sintomas","Ansiedade: 12 Sintomas Que Você Não Deve Ignorar","Conheça 12 sintomas de ansiedade que muitas pessoas carregam sem perceber — e saiba quando buscar ajuda psicológica.","Ansiedade","ansiedade","15 Jun 2025","10 min a ler"],
-  ["o-que-e-psicanalise","O Que é Psicanálise e Como Ela Funciona?","A psicanálise é uma das abordagens mais conhecidas da Psicologia e ajuda a compreender emoções, conflitos e experiências.","Psicanálise","psicanalise","15 Jun 2025","12 min a ler"],
-  // Row 2 — autoestima · relacionamentos · terapia
+  // Row 1, terapia · ansiedade · psicanálise  (homepage recent)
+  ["quando-procurar-psicologo","Quando Procurar um Psicólogo? 12 Sinais de Que Pode Ser a Hora","Quando procurar um psicólogo? Conheça 12 sinais de que pode ser a hora de buscar ajuda, mesmo sem estar em crise. Entenda o que acontece na primeira sessão e como a psicanálise pode ajudar.","Psicoterapia","psicoterapia","25 Mai 2025","10 min a ler"],
+  ["ansiedade-12-sintomas","Ansiedade: 12 Sintomas Que Você Não Deve Ignorar","Conheça 12 sintomas de ansiedade que muitas pessoas carregam sem perceber, e saiba quando buscar ajuda psicológica.","Ansiedade","ansiedade","15 Jun 2025","10 min a ler"],
+  ["o-que-e-psicanalise","O Que É Psicanálise? Significado, Como Funciona e Para Quem É Indicada","Psicanálise: o que é, o que significa na prática e como funciona o processo terapêutico. Entenda origem, sessões, inconsciente e para quem essa abordagem é indicada.","Psicanálise","psicanalise","15 Jun 2025","12 min a ler"],
+  // Row 2, autoestima · relacionamentos · terapia
   ["autoestima-baixa-sinais","Baixa Autoestima: Principais Sinais e Como Compreender o Que Está Por Trás Dela","A forma como nos enxergamos influencia praticamente todas as áreas da vida.","Autoestima","autoestima","25 Mai 2025","9 min a ler"],
-  ["relacionamento-toxico-sinais","Relacionamento Tóxico: 10 Sinais Que Merecem Atenção","Conflitos fazem parte de qualquer convivência — mas alguns padrões indicam um relacionamento tóxico que merece atenção.","Relacionamentos","relacionamentos","1 Jun 2025","12 min a ler"],
-  ["como-saber-se-preciso-de-terapia","Como Saber se Preciso de Terapia? 10 Sinais Que Merecem Atenção","Descubra 10 sinais de que você pode se beneficiar da terapia — do ponto de vista de um psicanalista. Não é preciso estar em crise para começar.","Psicoterapia","psicoterapia","19 Jun 2025","10 min a ler"],
-  // Row 3 — ansiedade · psicanálise · autoestima
-  ["ansiedade-e-insonia","Ansiedade Pode Causar Insônia? Entenda a Relação Entre Sono e Saúde Emocional","Pensamentos acelerados e preocupações podem interferir no sono — entenda como ansiedade e insônia se relacionam.","Ansiedade","ansiedade","5 Jun 2025","8 min a ler"],
+  ["relacionamento-toxico-sinais","Relacionamento Tóxico: 10 Sinais Que Merecem Atenção","Conflitos fazem parte de qualquer convivência, mas alguns padrões indicam um relacionamento tóxico que merece atenção.","Relacionamentos","relacionamentos","1 Jun 2025","12 min a ler"],
+  ["como-saber-se-preciso-de-terapia","Como Saber se Preciso de Terapia? 10 Sinais Que Merecem Atenção","Descubra 10 sinais de que você pode se beneficiar da terapia, do ponto de vista de um psicanalista. Não é preciso estar em crise para começar.","Psicoterapia","psicoterapia","19 Jun 2025","10 min a ler"],
+  // Row 3, ansiedade · psicanálise · autoestima
+  ["ansiedade-e-insonia","Ansiedade Pode Causar Insônia? Entenda a Relação Entre Sono e Saúde Emocional","Pensamentos acelerados e preocupações podem interferir no sono, entenda como ansiedade e insônia se relacionam.","Ansiedade","ansiedade","5 Jun 2025","8 min a ler"],
   ["psicanalise-funciona","A Psicanálise Funciona? Entenda Como Acontece o Processo Terapêutico","Entenda como o processo psicanalítico se desenvolve e o que pode ser esperado ao iniciar a terapia.","Psicanálise","psicanalise","1 Jun 2025","11 min a ler"],
-  ["critica-interna-como-lidar","Por Que Sou Tão Crítico Comigo Mesmo? Entenda as Raízes da Autocrítica Excessiva","A autocrítica excessiva pode minar a autoestima e a qualidade de vida — entenda suas raízes e como a terapia ajuda.","Autoestima","autoestima","5 Jun 2025","11 min a ler"],
-  // Row 4 — relacionamentos · terapia · ansiedade
-  ["medo-de-abandono","Medo de Abandono: Por Que Tenho Tanto Medo de Ser Deixado?","O medo de abandono pode gerar angústia intensa nos relacionamentos — entenda suas origens e como a terapia pode ajudar.","Relacionamentos","relacionamentos","5 Jun 2025","10 min a ler"],
+  ["critica-interna-como-lidar","Por Que Sou Tão Crítico Comigo Mesmo? Entenda as Raízes da Autocrítica Excessiva","A autocrítica excessiva pode minar a autoestima e a qualidade de vida, entenda suas raízes e como a terapia ajuda.","Autoestima","autoestima","5 Jun 2025","11 min a ler"],
+  // Row 4, relacionamentos · terapia · ansiedade
+  ["medo-de-abandono","Medo de Abandono: Por Que Tenho Tanto Medo de Ser Deixado?","O medo de abandono pode gerar angústia intensa nos relacionamentos, entenda suas origens e como a terapia pode ajudar.","Relacionamentos","relacionamentos","5 Jun 2025","10 min a ler"],
   ["terapia-online-funciona","Terapia Online Funciona? Entenda Como São as Sessões e os Benefícios","Entenda como funciona a terapia online, como são as sessões por videochamada e por que ela pode ser tão eficaz quanto o atendimento presencial.","Psicoterapia","psicoterapia","15 Jun 2025","8 min a ler"],
   ["pensamentos-acelerados","Pensamentos Acelerados: O Que Podem Significar?","Quando a mente não para, pensamentos surgem um atrás do outro e podem indicar ansiedade ou sobrecarga emocional.","Ansiedade","ansiedade","1 Jun 2025","9 min a ler"],
-  // Row 5 — psicanálise · autoestima · relacionamentos
-  ["psicanalise-vs-tcc","Qual a Diferença Entre Psicanálise e TCC? Entenda as Principais Características","Ao procurar um psicólogo, muitas pessoas se deparam com diferentes abordagens — conheça as diferenças entre psicanálise e TCC.","Psicanálise","psicanalise","19 Jun 2025","10 min a ler"],
-  ["inseguranca","Insegurança: Quando Procurar Ajuda e Como Compreender Esse Sentimento","Sentir insegurança em determinados momentos é natural — mas quando ela se torna constante, pode merecer atenção.","Autoestima","autoestima","19 Jun 2025","8 min a ler"],
-  ["ciumes-em-excesso","Ciúmes em Excesso: Quando Se Torna Um Problema?","Ciúmes podem surgir em qualquer relacionamento — o problema é quando se tornam excessivos e geram sofrimento.","Relacionamentos","relacionamentos","15 Jun 2025","10 min a ler"],
-  // Row 6 — terapia · ansiedade · psicanálise
+  // Row 5, psicanálise · autoestima · relacionamentos
+  ["psicanalise-vs-tcc","Qual a Diferença Entre Psicanálise e TCC? Entenda as Principais Características","Ao procurar um psicólogo, muitas pessoas se deparam com diferentes abordagens, conheça as diferenças entre psicanálise e TCC.","Psicanálise","psicanalise","19 Jun 2025","10 min a ler"],
+  ["inseguranca","Insegurança: Quando Procurar Ajuda e Como Compreender Esse Sentimento","Sentir insegurança em determinados momentos é natural, mas quando ela se torna constante, pode merecer atenção.","Autoestima","autoestima","19 Jun 2025","8 min a ler"],
+  ["ciumes-em-excesso","Ciúmes em Excesso: Quando Se Torna Um Problema?","Ciúmes podem surgir em qualquer relacionamento, o problema é quando se tornam excessivos e geram sofrimento.","Relacionamentos","relacionamentos","15 Jun 2025","10 min a ler"],
+  // Row 6, terapia · ansiedade · psicanálise
   ["terapia-online-ou-presencial","Terapia Online ou Presencial: Qual a Melhor Opção?","Se você está pensando em começar terapia, provavelmente já se perguntou qual modalidade faz mais sentido para você.","Psicoterapia","psicoterapia","19 Jun 2025","8 min a ler"],
-  ["ansiedade-sintomas-fisicos","Ansiedade Pode Causar Sintomas Físicos? Entenda Como o Corpo Também Fala","A ansiedade não afeta apenas a mente — o corpo também manifesta tensão, palpitações e outros sintomas físicos.","Ansiedade","ansiedade","25 Mai 2025","10 min a ler"],
+  ["ansiedade-sintomas-fisicos","Ansiedade Pode Causar Sintomas Físicos? Entenda Como o Corpo Também Fala","A ansiedade não afeta apenas a mente, o corpo também manifesta tensão, palpitações e outros sintomas físicos.","Ansiedade","ansiedade","25 Mai 2025","10 min a ler"],
   ["psicanalise-online","Psicanálise Online Funciona? Entenda Como Acontecem as Sessões","A psicanálise online tornou o processo analítico mais acessível para pessoas em diferentes cidades e contextos.","Psicanálise","psicanalise","10 Jun 2025","8 min a ler"],
-  // Row 7 — autoestima · relacionamentos · terapia
+  // Row 7, autoestima · relacionamentos · terapia
   ["terapia-ajuda-autoestima","Como a Terapia Pode Ajudar na Autoestima?","A autoestima influencia como nos relacionamos com nós mesmos, com os outros e com o mundo.","Autoestima","autoestima","15 Jun 2025","9 min a ler"],
   ["dependencia-emocional","Dependência Emocional: O Que É, Principais Sinais e Como Superar","Saiba o que é dependência emocional, como ela se manifesta e como construir relações mais saudáveis.","Relacionamentos","relacionamentos","25 Mai 2025","10 min a ler"],
   ["como-escolher-um-psicologo","Psicólogo em Salvador: Como Escolher o Profissional Ideal Para Você","Veja como escolher um psicólogo online para pacientes de Salvador: critérios, abordagens e sinais de que você encontrou o profissional certo.","Psicoterapia","psicoterapia","1 Jun 2025","8 min a ler"],
-  // Row 8 — psicanálise · terapia · psicanálise
-  ["quando-procurar-psicanalista","Quando Procurar um Psicanalista? Entenda Quando a Psicanálise Pode Ajudar","Não existe um único motivo para iniciar psicanálise — dúvidas emocionais, conflitos e autoconhecimento são motivos legítimos.","Psicanálise","psicanalise","25 Mai 2025","9 min a ler"],
-  ["o-que-esperar-da-primeira-sessao","O Que Esperar da Primeira Sessão de Terapia?","Decidir procurar ajuda psicológica costuma ser um passo importante — e a primeira sessão pode trazer muitas dúvidas.","Psicoterapia","psicoterapia","10 Jun 2025","7 min a ler"],
-  ["quanto-tempo-dura-psicanalise","Quanto Tempo Dura a Psicanálise? Entenda Como Funciona o Processo Analítico","A duração da psicanálise varia conforme objetivos, história e rito de cada pessoa — não existe um prazo fixo.","Psicanálise","psicanalise","5 Jun 2025","10 min a ler"],
+  // Row 8, psicanálise · terapia · psicanálise
+  ["quando-procurar-psicanalista","Quando Procurar um Psicanalista? Sinais de Que a Psicanálise Pode Ajudar","Quando procurar um psicanalista? Veja sinais de que a psicanálise pode ajudar, o que faz um psicanalista e como saber se essa abordagem combina com você.","Psicanálise","psicanalise","25 Mai 2025","9 min a ler"],
+  ["o-que-esperar-da-primeira-sessao","O Que Esperar da Primeira Sessão de Terapia?","Decidir procurar ajuda psicológica costuma ser um passo importante, e a primeira sessão pode trazer muitas dúvidas.","Psicoterapia","psicoterapia","10 Jun 2025","7 min a ler"],
+  ["quanto-tempo-dura-psicanalise","Quanto Tempo Dura a Psicanálise? Entenda Como Funciona o Processo Analítico","A duração da psicanálise varia conforme objetivos, história e rito de cada pessoa, não existe um prazo fixo.","Psicanálise","psicanalise","5 Jun 2025","10 min a ler"],
   // Row 9
   ["quanto-tempo-dura-a-terapia","Quanto Tempo Dura a Terapia? Entenda Como Funciona o Processo Terapêutico","Uma das perguntas mais comuns entre quem está pensando em iniciar acompanhamento psicológico é quanto tempo dura a terapia.","Psicoterapia","psicoterapia","5 Jun 2025","9 min a ler"],
 ];
@@ -208,8 +215,31 @@ const RAW: [string,string,string,string,string,string,string][] = [
 const ARTICLES: Article[] = RAW.map(([slug,title,excerpt,category,categorySlug,date,readTime], i) => ({
   slug, title, excerpt, category, categorySlug, date, readTime,
   image: ARTICLE_IMAGES[i],
-  content: `${excerpt}\n\nA psicoterapia oferece um espaço único de escuta e reflexão, onde cada pessoa pode explorar sua história com liberdade e sem julgamentos.\n\nPor meio de um processo contínuo e colaborativo, é possível compreender melhor os próprios sentimentos, identificar padrões que se repetem e construir novas formas de lidar com os desafios do dia a dia.\n\nO trabalho terapêutico não segue um roteiro fixo — ele se adapta ao ritmo e às necessidades de cada pessoa, respeitando sua singularidade e seu tempo.\n\nBuscar terapia é um ato de coragem e cuidado consigo mesmo. Se você sente que chegou o momento de dar esse passo, estou aqui para caminhar junto com você.`,
+  imageCard: ARTICLE_CARD_IMAGES[i],
 }));
+
+const HOMEPAGE_FEATURED_SLUGS = [
+  "o-que-e-psicanalise",
+  "quando-procurar-psicologo",
+  "quando-procurar-psicanalista",
+] as const;
+
+const CATEGORY_ENTRY_POINTS: Record<string, { label: string; to: string }[]> = {
+  psicanalise: [
+    { label: "O que é psicanálise", to: "/conteudos/psicanalise/o-que-e-psicanalise" },
+    { label: "Quando procurar um psicanalista", to: "/conteudos/psicanalise/quando-procurar-psicanalista" },
+  ],
+  psicoterapia: [
+    { label: "Quando procurar um psicólogo", to: "/conteudos/psicoterapia/quando-procurar-psicologo" },
+    { label: "Como saber se preciso de terapia", to: "/conteudos/psicoterapia/como-saber-se-preciso-de-terapia" },
+  ],
+};
+
+function getFeaturedArticles(): Article[] {
+  return HOMEPAGE_FEATURED_SLUGS
+    .map((slug) => ARTICLES.find((a) => a.slug === slug))
+    .filter((a): a is Article => Boolean(a));
+}
 
 export function getArticleByPath(pathname: string): Article | undefined {
   const match = pathname.match(/^\/conteudos\/([^/]+)\/([^/]+)\/?$/);
@@ -221,14 +251,58 @@ export function getArticleByPath(pathname: string): Article | undefined {
 function HeroImage({ className = "" }: { className?: string }) {
   return (
     <picture className={`block size-full ${className}`.trim()}>
+      <source media="(max-width: 768px)" srcSet={imgHeroMobileAvif} type="image/avif" />
+      <source media="(max-width: 768px)" srcSet={imgHeroMobile} type="image/webp" />
       <source media="(min-width: 769px)" srcSet={imgHero} type="image/webp" />
       <img
-        src={imgHeroMobile}
+        src={imgHero}
         alt="Breno, psicólogo clínico"
         width={720}
         height={784}
         loading="eager"
         fetchPriority="high"
+        decoding="async"
+        className="w-full h-full object-cover max-md:object-[center_20%]"
+      />
+    </picture>
+  );
+}
+
+function ArticleCardImage({ article, className }: { article: Article; className: string }) {
+  const card = article.imageCard;
+  const imgProps = {
+    alt: article.title,
+    width: 640,
+    height: 440,
+    loading: "lazy" as const,
+    decoding: "async" as const,
+    className,
+  };
+
+  if (card) {
+    return (
+      <picture className="block size-full">
+        <source media="(max-width: 768px)" srcSet={card} type="image/webp" />
+        <img src={article.image} {...imgProps} />
+      </picture>
+    );
+  }
+
+  return <img src={article.image} {...imgProps} />;
+}
+
+function AboutImage({ className = "", priority = false }: { className?: string; priority?: boolean }) {
+  return (
+    <picture className={`block size-full ${className}`.trim()}>
+      <source media="(max-width: 768px)" srcSet={imgAboutMobile} type="image/webp" />
+      <source media="(min-width: 769px)" srcSet={imgAbout} type="image/webp" />
+      <img
+        src={imgAbout}
+        alt="Breno Vieira, psicólogo clínico"
+        width={800}
+        height={1000}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
         decoding="async"
         className="w-full h-full object-cover object-[center_20%]"
       />
@@ -312,7 +386,7 @@ function Meta({ date, readTime, invert = false }: { date: string; readTime: stri
   );
 }
 
-// Inline SVG logo — all 39 dark paths from Breno_s_logo-1.svg
+// Inline SVG logo, all 39 dark paths from Breno_s_logo-1.svg
 const LOGO_DARK_PATHS = [
   "M80.9238 54.7254L76.6582 29.7888L74.6659 29.3169L74.7533 28.5134H83.6869L83.5642 29.3169L80.5403 29.8407L83.4249 48.6092L83.949 53.24L83.2844 53.3628L85.1198 48.7661L93.2484 29.7534L90.2942 29.2992L90.3815 28.5134H97.4267L97.3216 29.2992L95.242 29.7357L84.054 54.6191L80.9251 54.7242L80.9238 54.7254Z",
   "M97.0772 54.8658C96.6456 54.8658 96.2608 54.7836 95.9229 54.6216C95.5849 54.4597 95.3318 54.194 95.1622 53.8258C94.9926 53.4589 94.9495 52.973 95.0305 52.367C95.066 52.1114 95.1381 51.6306 95.2495 50.9258C95.3596 50.2211 95.4938 49.3683 95.652 48.3663C95.809 47.3642 95.9748 46.2862 96.1507 45.1336C96.3254 43.9809 96.5026 42.8182 96.6836 41.6478C96.8646 40.4762 97.019 39.3843 97.1469 38.3709L95.0141 37.7066L95.1191 37.0778L100.171 36.1871L100.818 36.6236L98.5101 51.8621C98.4405 52.305 98.481 52.6073 98.6328 52.7706C98.7847 52.9338 98.9531 53.0148 99.1391 53.0148C99.3834 53.0148 99.6252 52.9477 99.8644 52.8136C100.104 52.6795 100.397 52.4201 100.748 52.0355L101.115 52.7339C100.882 53.0603 100.573 53.3867 100.188 53.7119C99.8037 54.0383 99.3493 54.3116 98.8252 54.533C98.3012 54.7545 97.7177 54.8645 97.0772 54.8645V54.8658ZM99.472 33.9311C98.8771 33.9311 98.4113 33.7388 98.0734 33.3542C97.7354 32.9695 97.5671 32.5039 97.5671 31.9561C97.5671 31.14 97.7861 30.4821 98.2227 29.9811C98.6594 29.48 99.2277 29.2295 99.9277 29.2295C100.581 29.2295 101.069 29.4243 101.396 29.8153C101.723 30.2063 101.886 30.6693 101.886 31.2045C101.886 32.008 101.667 32.6634 101.23 33.1707C100.793 33.6781 100.207 33.9311 99.4733 33.9311H99.472Z",
@@ -479,6 +553,12 @@ function Header() {
               </div>
             </div>
           </div>
+          <Link
+            to="/sobre"
+            className="px-3.5 py-2.5 lg:px-5 rounded-xl text-[13px] lg:text-[14px] font-semibold font-['Noto_Sans',sans-serif] text-[#092529] hover:bg-[rgba(9,37,41,0.05)] transition-colors"
+          >
+            Sobre
+          </Link>
           <a href={WA} target="_blank" rel="noopener noreferrer"
             className="ml-1 lg:ml-2 flex items-center gap-2 bg-[#AFD7BF] hover:bg-[#9DCAAF] active:scale-[0.98] transition-all px-4 py-2.5 lg:px-6 rounded-xl font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[13px] lg:text-[14px]">
             <WhatsAppIcon size={14} className="text-current" />Fale comigo
@@ -505,6 +585,10 @@ function Header() {
               <span style={{ color: muted }}><CatIcon slug={c.slug} size={13} /></span>{c.name}
             </Link>
           ))}
+          <Link to="/sobre" className="flex items-center gap-2 pl-6 pr-3 py-2.5 rounded-xl font-['Noto_Sans',sans-serif] font-semibold text-[#092529] text-[15px] hover:bg-[rgba(9,37,41,0.04)] transition-colors">
+            <User size={13} className="shrink-0 text-[#092529]" />
+            Sobre
+          </Link>
           <a href={WA} target="_blank" rel="noopener noreferrer"
             className="mt-2 flex items-center justify-center gap-2 bg-[#AFD7BF] hover:bg-[#9DCAAF] py-3.5 rounded-xl font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[15px] transition-colors">
             <WhatsAppIcon size={15} className="text-current" />Fale comigo
@@ -524,7 +608,7 @@ function Footer() {
             <Logo light className="h-[72px] w-auto shrink-0" />
             <div className="flex flex-col items-start gap-5 min-w-0 w-full md:col-start-2 lg:col-start-auto">
               <p className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.55)] text-[14px] leading-[1.7]">
-                Psicólogo clínico com orientação psicanalítica. Atendimento online para adultos e idosos em Salvador, em todo o Brasil e para brasileiros no exterior.
+                Psicólogo clínico com orientação psicanalítica. Atendimento online para adultos e idosos em todo o Brasil e brasileiros no exterior.
               </p>
               <a href={WA} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[rgba(175,215,191,0.3)] bg-[rgba(175,215,191,0.1)] hover:bg-[rgba(175,215,191,0.2)] text-[#AFD7BF] text-[13px] font-semibold font-['Noto_Sans',sans-serif] transition-colors">
@@ -548,9 +632,16 @@ function Footer() {
           <div>
             <p className="font-['Noto_Sans',sans-serif] font-bold text-[#AFD7BF] text-[11px] uppercase tracking-[0.12em] mb-5">Contato</p>
             <ul className="flex flex-col gap-3">
+              <li>
+                <Link to="/sobre" className="flex items-center gap-2 text-[rgba(255,247,242,0.55)] text-[13px] font-['Noto_Sans',sans-serif] hover:text-[#AFD7BF] transition-colors">
+                  <User size={13} color={mint} />
+                  Sobre
+                </Link>
+              </li>
               {([
-                { Icon: MapPin, text: "Salvador, Bahia" },
+                { Icon: MapPin, text: "Online · todo o Brasil" },
                 { whatsapp: true, text: "WhatsApp", href: WA },
+                { Icon: MapPin, text: "Perfil no Google", href: GOOGLE_BUSINESS_URL },
                 { Icon: Shield, text: "CRP 03/36165" },
               ] as const).map((item) => (
                 <li key={item.text}>
@@ -570,8 +661,16 @@ function Footer() {
           </div>
         </div>
         <div className="border-t border-[rgba(255,247,242,0.08)] pt-7 flex flex-col sm:flex-row justify-between gap-3">
-          <p className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.3)] text-[12px]">© 2025 Breno Psicólogo · CRP 03/36165 · Todos os direitos reservados</p>
-          <p className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.3)] text-[12px]">Atendimento psicológico online para todo o Brasil</p>
+          <p className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.3)] text-[12px]">© 2026 Breno Psicólogo · CRP 03/36165 · Todos os direitos reservados</p>
+          <div className="flex flex-col sm:items-end gap-1">
+            <Link to="/sobre" className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.3)] text-[12px] hover:text-[#AFD7BF] transition-colors">
+              Sobre
+            </Link>
+            <Link to="/politica-de-privacidade" className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.3)] text-[12px] hover:text-[#AFD7BF] transition-colors">
+              Política de privacidade
+            </Link>
+            <p className="font-['Noto_Sans',sans-serif] text-[rgba(255,247,242,0.3)] text-[12px]">Atendimento psicológico online para todo o Brasil</p>
+          </div>
         </div>
       </div>
     </footer>
@@ -586,7 +685,7 @@ function ArticleCard({ article }: { article: Article }) {
     >
       <div className="flex flex-col rounded-[20px] overflow-hidden bg-[#F8EDE4] border border-[rgba(9,37,41,0.04)]">
         <div className="h-[196px] md:h-[220px] lg:h-[196px] overflow-hidden shrink-0">
-          <img src={article.image} alt={article.title} width={640} height={440} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+          <ArticleCardImage article={article} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
         </div>
         <div className="flex flex-col gap-4 p-6 flex-1">
           <div className="flex items-center gap-1.5" style={{ color: muted }}>
@@ -605,12 +704,15 @@ function ArticleCard({ article }: { article: Article }) {
   );
 }
 
-function HeroHighlights() {
-  const items = [
-    { Icon: MapPin, bold: "Atendimento online", sub: "para todo o Brasil" },
-    { Icon: User, bold: "Psicoterapia", sub: "para adultos e idosos" },
-    { Icon: Brain, bold: "Abordagem", sub: "psicanalítica" },
-  ] as const;
+type HighlightItem = { Icon: React.ElementType; bold: string; sub: string };
+
+const DEFAULT_HERO_HIGHLIGHTS: HighlightItem[] = [
+  { Icon: MapPin, bold: "Atendimento online", sub: "para todo o Brasil" },
+  { Icon: User, bold: "Psicoterapia", sub: "para adultos e idosos" },
+  { Icon: Brain, bold: "Abordagem", sub: "psicanalítica" },
+];
+
+function HeroHighlights({ items = DEFAULT_HERO_HIGHLIGHTS }: { items?: readonly HighlightItem[] }) {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [active, setActive] = useState(0);
@@ -741,7 +843,7 @@ function SmallCard({ article }: { article: Article }) {
   return (
     <Link to={`/conteudos/${article.categorySlug}/${article.slug}`} className="group flex gap-4 items-start">
       <div className="w-[88px] h-[88px] md:w-[96px] md:h-[96px] rounded-2xl overflow-hidden shrink-0 border border-[rgba(9,37,41,0.06)]">
-        <img src={article.image} alt={article.title} width={640} height={440} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+        <ArticleCardImage article={article} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
       </div>
       <div className="flex flex-col gap-2 flex-1 min-w-0 pt-0.5">
         <span className="inline-flex items-center gap-1.5 font-['Noto_Sans',sans-serif] text-[11px] font-semibold uppercase tracking-[0.12em] text-[rgba(9,37,41,0.45)]">
@@ -816,7 +918,7 @@ function CTABanner() {
             Pronto para cuidar da sua <em>saúde emocional</em>?
           </h2>
           <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.7)] text-[16px] leading-[1.65]">
-            Entre em contato pelo WhatsApp para agendar sua primeira consulta. Atendo adultos e idosos em Salvador, todo o Brasil e brasileiros no exterior.
+            Entre em contato pelo WhatsApp para agendar sua primeira consulta. Atendo adultos e idosos em todo o Brasil e brasileiros no exterior.
           </p>
         </div>
         <a href={WA} target="_blank" rel="noopener noreferrer"
@@ -831,37 +933,39 @@ function CTABanner() {
 const FAQS: FAQItem[] = HOMEPAGE_FAQS;
 
 function FAQAccordion({ items, className = "" }: { items: FAQItem[]; className?: string }) {
-  const [open, setOpen] = useState<number | null>(null);
-  const baseId = useRef(`faq-${Math.random().toString(36).slice(2, 9)}`).current;
   return (
     <div className={`flex flex-col divide-y divide-[rgba(9,37,41,0.08)] ${className}`}>
-      {items.map((faq, i) => {
-        const panelId = `${baseId}-panel-${i}`;
-        const isOpen = open === i;
-        return (
-        <div key={faq.q}>
-          <button
-            type="button"
-            id={`${baseId}-button-${i}`}
-            onClick={() => setOpen(isOpen ? null : i)}
-            aria-expanded={isOpen}
-            aria-controls={panelId}
-            className="w-full flex items-start justify-between gap-6 py-6 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#092529] focus-visible:ring-offset-2 focus-visible:rounded-lg"
-          >
-            <span className={`font-['Noto_Sans',sans-serif] font-bold text-[16px] leading-[1.5] transition-colors ${isOpen ? "text-[#092529]" : "text-[#3a5254] group-hover:text-[#092529]"}`}>
+      {items.map((faq) => (
+        <details key={faq.q} className="group">
+          <summary className="w-full flex items-start justify-between gap-6 py-6 text-left cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#092529] focus-visible:ring-offset-2 focus-visible:rounded-lg">
+            <span className="font-['Noto_Sans',sans-serif] font-bold text-[16px] leading-[1.5] text-[#3a5254] group-open:text-[#092529] group-hover:text-[#092529] transition-colors">
               {faq.q}
             </span>
-            <span className={`shrink-0 mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isOpen ? "bg-[#AFD7BF]" : "bg-[rgba(9,37,41,0.06)] group-hover:bg-[rgba(9,37,41,0.1)]"}`} aria-hidden="true">
-              {isOpen ? <Minus size={14} color={dark} /> : <Plus size={14} color="#576264" />}
+            <span className="shrink-0 mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center bg-[rgba(9,37,41,0.06)] group-hover:bg-[rgba(9,37,41,0.1)] group-open:bg-[#AFD7BF] transition-colors" aria-hidden="true">
+              <Plus size={14} color="#576264" className="group-open:hidden" />
+              <Minus size={14} color={dark} className="hidden group-open:block" />
             </span>
-          </button>
-          {isOpen && (
-            <div id={panelId} role="region" aria-labelledby={`${baseId}-button-${i}`} className="pb-6">
-              <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.65)] text-[15px] leading-[1.75] lg:max-w-[600px]">{faq.a}</p>
-            </div>
-          )}
-        </div>
-      );})}
+          </summary>
+          <div className="pb-6">
+            <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.65)] text-[15px] leading-[1.75] lg:max-w-[600px]">
+              {faq.a}
+              {faq.more && (
+                <>
+                  {" "}
+                  {faq.more.lead}{" "}
+                  <Link
+                    to={faq.more.to}
+                    className="font-semibold text-[#092529] underline decoration-[#AFD7BF] decoration-2 underline-offset-[3px] hover:text-[rgba(9,37,41,0.65)]"
+                  >
+                    {faq.more.label}
+                  </Link>
+                  .
+                </>
+              )}
+            </p>
+          </div>
+        </details>
+      ))}
     </div>
   );
 }
@@ -922,10 +1026,11 @@ function HomePage() {
               <div className="flex flex-col gap-5">
                 <Label><Sparkles size={12} />Acolhimento psicológico online</Label>
                 <h1 className={heroTitle}>
-                  O que se repete na sua vida <em>merece ser escutado</em>
+                  Atendimento psicológico online com <em>escuta, acolhimento e cuidado</em>
                 </h1>
                 <p className="font-['Noto_Sans',sans-serif] text-[#092529] text-[16px] md:text-[17px] leading-[1.7]">
-                  <strong className="font-semibold">Psicólogo clínico com atendimento online para adultos e idosos em Salvador, todo o Brasil e brasileiros no exterior.</strong>{" "}Um espaço de escuta, acolhimento e autoconhecimento através da orientação psicanalítica.
+                  Um espaço para falar, refletir e se cuidar emocionalmente, com atendimento online para{" "}
+                  <strong className="font-bold">adultos e idosos em todo o Brasil e no exterior, com orientação psicanalítica.</strong>
                 </p>
               </div>
               <a id="hero-cta" href={WA} target="_blank" rel="noopener noreferrer"
@@ -951,23 +1056,34 @@ function HomePage() {
         <div className={`mx-auto max-w-[1280px] ${sectionPad}`}>
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-10 md:gap-12 lg:gap-20">
             <Reveal className={aboutImage} x={-20}>
-              <img src={imgAbout} alt="Breno Psicólogo" width={800} height={1000} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+              <AboutImage />
             </Reveal>
             <Reveal className="flex flex-col gap-6 flex-1 min-w-0" delay={0.15}>
               <Label><User size={12} />Sobre mim</Label>
               <h2 className={sectionTitle}>
-                Olá, sou <em>Breno</em>, psicólogo clínico
+                Olá, sou <em>Breno Vieira</em>, psicólogo clínico
               </h2>
               <p className="font-['Noto_Sans',sans-serif] font-semibold text-[rgba(9,37,41,0.35)] text-[12px] uppercase tracking-[0.1em]">CRP 03/36165</p>
               <div className="flex flex-col gap-4 font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[16px] leading-[1.7]">
-                <p>Sou psicólogo clínico e realizo atendimentos online para adultos e idosos em Salvador, na Bahia, todo o Brasil e brasileiros no exterior.</p>
+                <p>Sou psicólogo clínico e realizo atendimentos online para adultos e idosos em todo o Brasil e brasileiros no exterior, com base profissional em Salvador, Bahia.</p>
                 <p className="font-semibold text-[rgba(9,37,41,0.85)]">Minha prática é orientada pela psicanálise, oferecendo um espaço de escuta para compreender sentimentos, relações e conflitos que atravessam sua história.</p>
               </div>
+              <Link to="/sobre"
+                className={`${ctaBtn} gap-3 border border-[rgba(9,37,41,0.13)] bg-[#FFF7F2] hover:bg-[#F0E6DD] px-5 py-3 rounded-2xl font-['Noto_Sans',sans-serif] text-[#092529] text-[14px] transition-colors`}>
+                <User size={15} />
+                <span className="font-bold">Conheça o psicólogo</span>
+                <ArrowRight size={13} />
+              </Link>
               <Link to="/conteudos/psicanalise/o-que-e-psicanalise"
                 className={`${ctaBtn} gap-3 border border-[rgba(9,37,41,0.13)] bg-[#FFF7F2] hover:bg-[#F0E6DD] px-5 py-3 rounded-2xl font-['Noto_Sans',sans-serif] text-[#092529] text-[14px] transition-colors`}>
                 <Brain size={15} />
-                <span className="font-bold">Psicanálise</span>
-                <span className="text-[rgba(9,37,41,0.4)] italic">— Saiba mais</span>
+                <span className="font-bold">O que é psicanálise?</span>
+                <ArrowRight size={13} />
+              </Link>
+              <Link to="/conteudos/psicanalise/quando-procurar-psicanalista"
+                className={`${ctaBtn} gap-3 border border-[rgba(9,37,41,0.13)] bg-[#FFF7F2] hover:bg-[#F0E6DD] px-5 py-3 rounded-2xl font-['Noto_Sans',sans-serif] text-[#092529] text-[14px] transition-colors`}>
+                <BookOpen size={15} />
+                <span className="font-bold">Quando procurar um psicanalista</span>
                 <ArrowRight size={13} />
               </Link>
             </Reveal>
@@ -991,12 +1107,9 @@ function HomePage() {
               { Icon: Smile, title: "Sofrimento emocional",         desc: "Explore emoções difíceis e encontre um espaço seguro para compreender seu sofrimento." },
               { Icon: Brain, title: "Autoconhecimento e relações", desc: "Compreenda os padrões que se repetem em sua vida e descubra novas formas de se relacionar consigo mesmo e com os outros." },
             ].map(({ Icon, title, desc }, i) => (
-              <motion.div
+              <Reveal
                 key={title}
-                initial={IS_SSR ? false : { opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.65, ease: easeOut, delay: i * 0.1 }}
+                delay={i * 0.1}
                 className="bg-[#BFE2CD] rounded-2xl p-6 md:p-5 lg:p-8 flex flex-col gap-4 md:gap-3 lg:gap-5 min-w-0"
               >
                 <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center bg-[#AFD7BF] shrink-0">
@@ -1004,7 +1117,7 @@ function HomePage() {
                 </div>
                 <p className="font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[20px] md:text-[17px] lg:text-[22px] leading-[1.25] tracking-[-0.4px]">{title}</p>
                 <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.75)] text-[14px] md:text-[13px] lg:text-[15px] leading-[1.6] lg:leading-[1.65]">{desc}</p>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -1017,7 +1130,10 @@ function HomePage() {
             <Label align="center"><CheckCircle2 size={12} />Benefícios</Label>
             <h2 className={sectionTitle}>O que a psicoterapia pode <em>proporcionar</em></h2>
             <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.55)] text-[16px] leading-[1.65]">
-              A terapia online oferece praticidade, flexibilidade e acesso ao acompanhamento de qualquer lugar do Brasil.
+              A terapia online oferece praticidade, flexibilidade e acesso ao acompanhamento de qualquer lugar do Brasil.{" "}
+              <Link to="/conteudos/psicoterapia/quando-procurar-psicologo" className="font-semibold text-[#092529] underline decoration-[rgba(9,37,41,0.2)] underline-offset-2 hover:decoration-[#092529]">
+                Quando procurar um psicólogo?
+              </Link>
             </p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
@@ -1084,8 +1200,8 @@ function HomePage() {
               <MapPin size={21} color={dark} />
             </div>
             <div>
-              <p className="font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[17px] tracking-[-0.2px] mb-1">Atendimento psicológico online em Salvador e todo o Brasil</p>
-              <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.7)] text-[14px] leading-[1.6]">Atendo pacientes em Salvador, na Bahia, em todas as regiões do Brasil e brasileiros no exterior, com escuta acolhedora, sigilo profissional e acompanhamento individualizado.</p>
+              <p className="font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[17px] tracking-[-0.2px] mb-1">Atendimento psicológico online em todo o Brasil</p>
+              <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.7)] text-[14px] leading-[1.6]">Atendo pacientes de qualquer estado, com escuta acolhedora, sigilo profissional e acompanhamento individualizado, também para brasileiros que vivem no exterior.</p>
             </div>
           </div>
           </Reveal>
@@ -1104,14 +1220,8 @@ function HomePage() {
               Ver todos <ArrowRight size={13} />
             </Link>
           </Reveal>
-          <div className="grid grid-cols-1 gap-5 md:hidden">
-            {ARTICLES.slice(0, 3).map(a => <ArticleCard key={a.slug} article={a} />)}
-          </div>
-          <div className="hidden md:block lg:hidden">
-            <ArticleCardsCarousel articles={ARTICLES.slice(0, 3)} />
-          </div>
-          <div className="hidden lg:grid lg:grid-cols-3 gap-5">
-            {ARTICLES.slice(0, 3).map(a => <ArticleCard key={a.slug} article={a} />)}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {getFeaturedArticles().map(a => <ArticleCard key={a.slug} article={a} />)}
           </div>
           <Link to="/conteudos" className="md:hidden flex items-center justify-center gap-2 py-4 border border-[rgba(9,37,41,0.12)] rounded-2xl font-['Noto_Sans',sans-serif] font-semibold text-[#092529] text-[14px] hover:bg-[rgba(9,37,41,0.03)]">
             Ver todos os artigos <ArrowRight size={14} />
@@ -1254,7 +1364,7 @@ function BlogHubPage() {
   const gridRef = useRef<HTMLDivElement>(null);
   const cols = useGridColumns();
   const perPage = cols * GRID_ROWS;
-  const featured = ARTICLES.slice(0, 3);
+  const featured = getFeaturedArticles();
   const filtered = activeCat ? ARTICLES.filter(a => a.categorySlug === activeCat) : ARTICLES;
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
   const paginated = filtered.slice((page - 1) * perPage, page * perPage);
@@ -1276,7 +1386,7 @@ function BlogHubPage() {
       <section className="w-full bg-[#FFF7F2] border-b border-[rgba(9,37,41,0.07)]">
         <div className={`mx-auto max-w-[1280px] ${sectionPad} py-8 md:py-10 lg:py-12`}>
           <nav className="flex items-center gap-2 flex-wrap" aria-label="Localização">
-            <Link to="/" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Homepage</Link>
+            <Link to="/" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Início</Link>
             <Sep />
             <span className="font-['Noto_Sans',sans-serif] text-[13px] font-semibold text-[#092529]">Conteúdos</span>
           </nav>
@@ -1284,9 +1394,9 @@ function BlogHubPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: easeOut, delay: 0.05 }}
-            className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-none lg:flex gap-8 md:gap-10 items-stretch"
+            className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px] gap-8 md:gap-10 items-stretch"
           >
-            <div className="relative isolate rounded-3xl overflow-hidden w-full min-w-0 self-stretch h-[420px] sm:h-[480px] md:h-full md:min-h-[440px] lg:flex-1 lg:min-h-[520px] border border-[rgba(9,37,41,0.08)] shadow-[0_12px_40px_rgba(9,37,41,0.08)]">
+            <div className="relative isolate rounded-3xl overflow-hidden w-full min-w-0 h-[420px] sm:h-[480px] md:h-full md:min-h-[440px] lg:h-full lg:min-h-0 border border-[rgba(9,37,41,0.08)] shadow-[0_12px_40px_rgba(9,37,41,0.08)]">
               {featured.map((art, i) => (
                 <div
                   key={art.slug}
@@ -1350,15 +1460,14 @@ function BlogHubPage() {
                 <ChevronRight size={17} color={dark} />
               </button>
             </div>
-            <div className="w-full lg:w-[360px] xl:w-[380px] shrink-0 flex flex-col gap-5 md:gap-6 self-stretch lg:pl-1">
+            <div className="w-full min-w-0 flex flex-col gap-5 md:gap-6 lg:pl-1">
               <div className="flex flex-col gap-3">
-                <Label><BookOpen size={12} />Conteúdos</Label>
-                <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15]">
+                <p className="font-['Merriweather',serif] font-bold text-[#092529] text-[22px] md:text-[24px] leading-[1.2] text-[rgba(9,37,41,0.75)]">
                   Mais recentes
-                </h2>
+                </p>
               </div>
               <div className="flex flex-col divide-y divide-[rgba(9,37,41,0.08)]">
-                {ARTICLES.slice(0, 3).map(a => (
+                {getFeaturedArticles().map(a => (
                   <div key={a.slug} className="py-5 first:pt-0 last:pb-0"><SmallCard article={a} /></div>
                 ))}
               </div>
@@ -1369,7 +1478,7 @@ function BlogHubPage() {
       <section className={`w-full bg-[#FFF7F2] py-14 md:py-20 lg:py-24`}>
         <div className={`mx-auto max-w-[1280px] ${sectionPad} flex flex-col gap-8`}>
           <Reveal className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-5">
-            <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15] shrink-0">Conteúdos</h2>
+            <h1 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15] shrink-0">Artigos de psicologia</h1>
             <CategoryFilterNav activeSlug={activeCat} onSelect={setActiveCat} />
           </Reveal>
           <div ref={gridRef} className="flex flex-col gap-6 scroll-mt-28">
@@ -1395,6 +1504,7 @@ function CategoryPage() {
   const articles = ARTICLES.filter(a => a.categorySlug === category);
   const totalPages = Math.max(1, Math.ceil(articles.length / perPage));
   const paginated = articles.slice((page - 1) * perPage, page * perPage);
+  const entryPoints = cat ? CATEGORY_ENTRY_POINTS[cat.slug] : undefined;
 
   useEffect(() => { setPage(1); }, [category]);
   useEffect(() => {
@@ -1415,7 +1525,7 @@ function CategoryPage() {
       <section className="w-full bg-[#FFF7F2] border-b border-[rgba(9,37,41,0.07)]">
         <div className={`mx-auto max-w-[1280px] ${sectionPad} py-8 md:py-10 lg:py-12`}>
           <nav className="flex items-center gap-2 flex-wrap" aria-label="Localização">
-            <Link to="/" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Homepage</Link>
+            <Link to="/" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Início</Link>
             <Sep />
             <Link to="/conteudos" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Conteúdos</Link>
             <Sep />
@@ -1438,11 +1548,25 @@ function CategoryPage() {
                   {cat.name}
                 </span>
                 <h1 className="font-['Merriweather',serif] font-bold text-[#092529] text-[36px] md:text-[44px] lg:text-[52px] leading-[1.1] tracking-[-0.02em]">
-                  {cat.name}
+                  {getCategoryHeading(cat.slug, cat.name)}
                 </h1>
                 <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[16px] md:text-[17px] leading-[1.7] max-w-[560px]">
                   {cat.description}
                 </p>
+                {entryPoints && entryPoints.length > 0 && (
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-1">
+                    {entryPoints.map((entry) => (
+                      <Link
+                        key={entry.to}
+                        to={entry.to}
+                        className="inline-flex items-center gap-2 self-start border border-[rgba(9,37,41,0.13)] bg-[#FFF7F2] hover:bg-[#F0E6DD] px-4 py-2.5 rounded-2xl font-['Noto_Sans',sans-serif] font-semibold text-[#092529] text-[13px] transition-colors"
+                      >
+                        {entry.label}
+                        <ArrowRight size={13} />
+                      </Link>
+                    ))}
+                  </div>
+                )}
                 <div className="flex flex-wrap items-center gap-3 pt-1">
                   <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(9,37,41,0.1)] bg-[#FFF7F2] px-4 py-2 font-['Noto_Sans',sans-serif] font-semibold text-[13px] text-[#092529]">
                     <BookOpen size={14} className="text-[rgba(9,37,41,0.55)]" />
@@ -1493,7 +1617,7 @@ function CategoryPage() {
       <section className={`w-full bg-[#FFF7F2] py-14 md:py-20 lg:py-24`}>
         <div className={`mx-auto max-w-[1280px] ${sectionPad} flex flex-col gap-8`}>
           <Reveal className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-5">
-            <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15] shrink-0">Conteúdos</h2>
+            <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15] shrink-0">Artigos</h2>
             <CategoryFilterNav activeSlug={category ?? null} />
           </Reveal>
           <div ref={gridRef} className="flex flex-col gap-6 scroll-mt-28">
@@ -1504,602 +1628,6 @@ function CategoryPage() {
           </div>
         </div>
       </section>
-      <CTABanner />
-    </>
-  );
-}
-
-function ArticleSignList({ signs }: { signs: { n: number; title: string; text: string }[] }) {
-  return (
-    <ol className="flex flex-col divide-y divide-[rgba(9,37,41,0.08)]">
-      {signs.map(s => (
-        <li key={s.n} className="py-6 md:py-7 first:pt-0">
-          <div className="flex flex-col gap-3 md:gap-3.5">
-            <div className="flex items-baseline gap-3 md:gap-4">
-              <span className="font-['Merriweather',serif] font-bold text-[20px] md:text-[22px] leading-none text-[rgba(9,37,41,0.5)] tabular-nums shrink-0">
-                {String(s.n).padStart(2, "0")}
-              </span>
-              <h3 className="font-['Merriweather',serif] font-bold text-[#092529] text-[18px] md:text-[20px] leading-[1.3]">
-                {s.title}
-              </h3>
-            </div>
-            <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[15px] md:text-[16px] leading-[1.75] md:pl-10">
-              {s.text}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function ArticleTopicCard({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-2xl border border-[rgba(9,37,41,0.08)] bg-[#F8EDE4]/60 p-5 md:p-6 flex flex-col gap-2.5">
-      <h3 className="font-['Merriweather',serif] font-bold text-[#092529] text-[18px] md:text-[19px] leading-[1.3]">
-        {title}
-      </h3>
-      {text && (
-        <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[15px] md:text-[16px] leading-[1.75]">
-          {text}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function ArticleTopicGrid({ topics }: { topics: { title: string; text: string }[] }) {
-  return (
-    <div className="flex flex-col gap-4 md:gap-5">
-      {topics.map(t => <ArticleTopicCard key={t.title} {...t} />)}
-    </div>
-  );
-}
-
-function ArticleThoughts({ items }: { items: string[] }) {
-  return (
-    <div className="rounded-2xl border border-[rgba(9,37,41,0.08)] bg-white/70 px-5 py-4 md:px-6 md:py-5 flex flex-col gap-2.5">
-      {items.map((item, i) => (
-        <p key={i} className="font-['Merriweather',serif] italic text-[#092529] text-[16px] md:text-[17px] leading-[1.55]">
-          &ldquo;{item}&rdquo;
-        </p>
-      ))}
-    </div>
-  );
-}
-
-function ArticleAnswer({ text }: { text: string }) {
-  return (
-    <p className="font-['Merriweather',serif] font-bold text-[#092529] text-[22px] md:text-[26px] leading-none tracking-[-0.01em]">
-      {text}
-    </p>
-  );
-}
-
-function ArticleCallout({ parts }: { parts: { text: string; link?: { slug: string; categorySlug: string } }[] }) {
-  return (
-    <div className="rounded-2xl border border-[#AFD7BF]/60 bg-[#AFD7BF]/20 px-5 py-4 md:px-6 md:py-5 flex gap-3 items-start">
-      <BookOpen size={18} className="shrink-0 mt-0.5 text-[#092529]/50" aria-hidden />
-      <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.78)] text-[15px] md:text-[16px] leading-[1.75]">
-        {parts.map((part, j) =>
-          part.link ? (
-            <Link
-              key={j}
-              to={`/conteudos/${part.link.categorySlug}/${part.link.slug}`}
-              className="font-semibold text-[#092529] underline decoration-[#AFD7BF] decoration-2 underline-offset-[3px] hover:text-[rgba(9,37,41,0.65)] transition-colors"
-            >
-              {part.text}
-            </Link>
-          ) : (
-            <span key={j}>{part.text}</span>
-          ),
-        )}
-      </p>
-    </div>
-  );
-}
-
-function renderInlineParts(parts: { text: string; link?: { slug: string; categorySlug: string } }[]) {
-  return parts.map((part, j) =>
-    part.link ? (
-      <Link
-        key={j}
-        to={`/conteudos/${part.link.categorySlug}/${part.link.slug}`}
-        className="font-semibold text-[#092529] underline decoration-[#AFD7BF] decoration-2 underline-offset-[3px] hover:text-[rgba(9,37,41,0.65)] transition-colors"
-      >
-        {part.text}
-      </Link>
-    ) : (
-      <span key={j}>{part.text}</span>
-    ),
-  );
-}
-
-function renderArticleBlock(block: ArticleBlock, key: number) {
-  switch (block.type) {
-    case "p":
-      if ("parts" in block && block.parts) {
-        return (
-          <p key={key} className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.78)] text-[16px] md:text-[17px] leading-[1.85]">
-            {renderInlineParts(block.parts)}
-          </p>
-        );
-      }
-      return (
-        <p key={key} className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.78)] text-[16px] md:text-[17px] leading-[1.85]">
-          {block.text}
-        </p>
-      );
-    case "h2":
-      return (
-        <h2
-          key={key}
-          id={slugifyHeading(block.text)}
-          className="font-['Merriweather',serif] font-bold text-[#092529] text-[24px] md:text-[28px] leading-[1.25] tracking-[-0.02em] mt-2 scroll-mt-28"
-        >
-          {block.text}
-        </h2>
-      );
-    case "h3":
-      return (
-        <h3
-          key={key}
-          className="font-['Merriweather',serif] font-bold text-[#092529] text-[20px] md:text-[22px] leading-[1.3] tracking-[-0.01em] mt-1"
-        >
-          {block.text}
-        </h3>
-      );
-    case "ul":
-      return (
-        <ul key={key} className="flex flex-col gap-2 pl-1">
-          {block.items.map((item, j) => (
-            <li
-              key={j}
-              className="flex gap-3 font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.78)] text-[16px] md:text-[17px] leading-[1.75]"
-            >
-              <span className="mt-[0.55em] shrink-0 size-1.5 rounded-full bg-[#AFD7BF]" aria-hidden />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      );
-    case "quote":
-      return (
-        <blockquote key={key} className="rounded-2xl border border-[rgba(9,37,41,0.08)] bg-[#F8EDE4] px-6 py-6 md:px-8 md:py-7">
-          <p className="font-['Merriweather',serif] font-bold italic text-[#092529] text-[20px] md:text-[22px] leading-[1.5]">
-            &ldquo;{block.text}&rdquo;
-          </p>
-        </blockquote>
-      );
-    case "image":
-      return (
-        <figure key={key} className="overflow-hidden rounded-3xl border border-[rgba(9,37,41,0.08)] shadow-[0_12px_40px_rgba(9,37,41,0.08)]">
-          <div className="aspect-[16/10] md:aspect-[21/10]">
-            <img src={block.src} alt={block.alt} width={800} height={500} loading="lazy" decoding="async" className="size-full object-cover" />
-          </div>
-          {block.caption && (
-            <figcaption className="px-5 py-4 md:px-6 font-['Noto_Sans',sans-serif] text-[13px] leading-[1.6] text-[rgba(9,37,41,0.55)] bg-[#F8EDE4]">
-              {block.caption}
-            </figcaption>
-          )}
-        </figure>
-      );
-    case "faq":
-      return <FAQAccordion key={key} items={block.items} />;
-    case "answer":
-      return <ArticleAnswer key={key} text={block.text} />;
-    case "thoughts":
-      return <ArticleThoughts key={key} items={block.items} />;
-    case "callout":
-      return <div key={key} className="-mt-2 md:-mt-3"><ArticleCallout parts={block.parts} /></div>;
-    default:
-      return null;
-  }
-}
-
-function renderArticleBlockGroup(blocks: ArticleBlock[], keyPrefix: string) {
-  const nodes: React.ReactNode[] = [];
-  let i = 0;
-  while (i < blocks.length) {
-    if (blocks[i].type === "sign") {
-      const signs: { n: number; title: string; text: string }[] = [];
-      while (i < blocks.length && blocks[i].type === "sign") {
-        const s = blocks[i] as { type: "sign"; n: number; title: string; text: string };
-        signs.push({ n: s.n, title: s.title, text: s.text });
-        i++;
-      }
-      nodes.push(<ArticleSignList key={`${keyPrefix}-signs-${i}`} signs={signs} />);
-    } else if (blocks[i].type === "topic") {
-      const topics: { title: string; text: string }[] = [];
-      while (i < blocks.length && blocks[i].type === "topic") {
-        const t = blocks[i] as { type: "topic"; title: string; text: string };
-        topics.push({ title: t.title, text: t.text });
-        i++;
-      }
-      nodes.push(<ArticleTopicGrid key={`${keyPrefix}-topics-${i}`} topics={topics} />);
-    } else {
-      nodes.push(renderArticleBlock(blocks[i], i));
-      i++;
-    }
-  }
-  return nodes;
-}
-
-function ArticleContentSection({
-  heading,
-  blocks,
-  isIntro,
-}: {
-  heading?: ArticleBlock;
-  blocks: ArticleBlock[];
-  isIntro?: boolean;
-}) {
-  const headingText = heading?.type === "h2" ? heading.text : "";
-  const isConclusion = headingText === "Conclusão";
-  const isFaq = headingText === "Perguntas frequentes";
-
-  return (
-    <section
-      className={
-        isIntro
-          ? "flex flex-col gap-6 md:gap-7"
-          : `flex flex-col gap-6 md:gap-7 pt-10 md:pt-12 border-t border-[rgba(9,37,41,0.08)] ${
-              isConclusion ? "rounded-2xl border border-[rgba(9,37,41,0.08)] bg-[#F8EDE4]/40 px-6 py-8 md:px-8 md:py-10 !pt-8" : ""
-            }`
-      }
-    >
-      {heading && heading.type === "h2" && (
-        <h2
-          id={slugifyHeading(heading.text)}
-          className={`font-['Merriweather',serif] font-bold text-[#092529] leading-[1.25] tracking-[-0.02em] scroll-mt-28 ${
-            isFaq ? "text-[26px] md:text-[30px]" : "text-[24px] md:text-[28px] mt-0"
-          }`}
-        >
-          {heading.text}
-        </h2>
-      )}
-      <div className="flex flex-col gap-6 md:gap-7">
-        {renderArticleBlockGroup(blocks, headingText || "intro")}
-      </div>
-    </section>
-  );
-}
-
-function splitArticleSections(blocks: ArticleBlock[]) {
-  const sections: { heading?: ArticleBlock; blocks: ArticleBlock[]; isIntro?: boolean }[] = [];
-  let currentBlocks: ArticleBlock[] = [];
-  let currentHeading: ArticleBlock | undefined;
-
-  for (const block of blocks) {
-    if (block.type === "h2") {
-      if (currentHeading || currentBlocks.length) {
-        sections.push({ heading: currentHeading, blocks: currentBlocks, isIntro: !currentHeading && sections.length === 0 });
-      }
-      currentHeading = block;
-      currentBlocks = [];
-    } else {
-      currentBlocks.push(block);
-    }
-  }
-  if (currentHeading || currentBlocks.length) {
-    sections.push({
-      heading: currentHeading,
-      blocks: currentBlocks,
-      isIntro: !currentHeading && sections.length === 0,
-    });
-  }
-  return sections;
-}
-
-function ArticleBody({ blocks }: { blocks: ArticleBlock[] }) {
-  const sections = splitArticleSections(blocks);
-  return (
-    <div className="flex flex-col gap-2 md:gap-4">
-      {sections.map((section, idx) => (
-        <ArticleContentSection
-          key={idx}
-          heading={section.heading}
-          blocks={section.blocks}
-          isIntro={section.isIntro}
-        />
-      ))}
-    </div>
-  );
-}
-
-function resolveArticleBlocks(article: Article): ArticleBlock[] {
-  const idx = ARTICLES.findIndex(a => a.slug === article.slug && a.categorySlug === article.categorySlug);
-  const midImage = ARTICLE_IMAGES[idx] ?? ARTICLE_IMAGES[0];
-  let blocks: ArticleBlock[] = ARTICLE_BLOCKS[article.slug]
-    ?? article.content.split("\n\n").filter(Boolean).map(text => ({ type: "p" as const, text }));
-  blocks = blocks.map(b =>
-    b.type === "image" && !b.src ? { ...b, src: midImage } : b,
-  );
-  if (!ARTICLE_BLOCKS[article.slug] && blocks.length >= 8 && !blocks.some(b => b.type === "image")) {
-    const mid = Math.floor(blocks.length / 2);
-    blocks = [
-      ...blocks.slice(0, mid),
-      {
-        type: "image",
-        src: midImage,
-        alt: article.title,
-        caption: "Reflexão e autoconhecimento no processo terapêutico.",
-      },
-      ...blocks.slice(mid),
-    ];
-  }
-  return blocks;
-}
-
-function ArticleToc({ slug }: { slug: string }) {
-  const items = ARTICLE_TOC[slug];
-  if (!items || items.length === 0) return null;
-  return (
-    <nav aria-label="Sumário do artigo" className="sticky top-28 flex flex-col gap-3">
-      <p className="font-['Noto_Sans',sans-serif] font-bold text-[11px] uppercase tracking-[0.12em] text-[rgba(9,37,41,0.45)]">
-        Neste artigo
-      </p>
-      <ul className="flex flex-col gap-0.5">
-        {items.map((item, i) => (
-          <li key={i}>
-            <a
-              href={`#${slugifyHeading(item.h2)}`}
-              className="block py-1.5 font-['Noto_Sans',sans-serif] text-[13px] text-[rgba(9,37,41,0.55)] hover:text-[#092529] transition-colors leading-snug"
-            >
-              {item.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
-
-function ArticleRecommendedReading({ currentSlug }: { currentSlug: string }) {
-  const recommended = ARTICLE_RECOMMENDED[currentSlug] ?? [];
-  const items = recommended
-    .map(r => {
-      const article = ARTICLES.find(a => a.slug === r.slug && a.categorySlug === r.categorySlug);
-      return article ? { article, title: r.title } : null;
-    })
-    .filter(Boolean);
-
-  if (items.length === 0) return null;
-
-  return (
-    <section className="mt-10 md:mt-12 pt-10 border-t border-[rgba(9,37,41,0.08)]" aria-label="Leitura recomendada">
-      <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[22px] md:text-[24px] leading-[1.2] mb-2">
-        Leitura recomendada
-      </h2>
-      <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.55)] text-[15px] leading-[1.65] mb-6">
-        Se você deseja aprofundar o tema, estes conteúdos podem ajudar:
-      </p>
-      <ul className="flex flex-col divide-y divide-[rgba(9,37,41,0.08)]">
-        {items.map(({ article, title }) => (
-          <li key={article.slug}>
-            <Link
-              to={`/conteudos/${article.categorySlug}/${article.slug}`}
-              className="group flex items-center justify-between gap-4 py-4 md:py-4 transition-colors"
-            >
-              <span className="font-['Noto_Sans',sans-serif] font-semibold text-[#092529] text-[15px] leading-[1.45] group-hover:text-[rgba(9,37,41,0.65)] transition-colors">
-                {title}
-              </span>
-              <ArrowRight size={15} className="shrink-0 text-[rgba(9,37,41,0.3)] group-hover:text-[#092529] group-hover:translate-x-0.5 transition-all" />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function ArticlePage() {
-  const { category, slug } = useParams();
-  const article = ARTICLES.find(a => a.slug === slug && a.categorySlug === category);
-  const catObj  = CATEGORIES.find(c => c.slug === category);
-  const related = ARTICLES.filter(a => a.categorySlug === category && a.slug !== slug).slice(0, 3);
-  const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
-
-  const handleShare = async () => {
-    if (!article || !category || !slug) return;
-    const result = await sharePage({
-      title: article.title,
-      text: article.excerpt,
-      path: `/conteudos/${category}/${slug}`,
-    });
-    if (result === "copied") {
-      setShareStatus("copied");
-      window.setTimeout(() => setShareStatus("idle"), 2000);
-    }
-  };
-
-  if (!article) return <NotFoundPage />;
-  const blocks = resolveArticleBlocks(article);
-  const hasStructuredBody = Boolean(ARTICLE_BLOCKS[article.slug]);
-
-  return (
-    <>
-      <SEOHead pathname={`/conteudos/${category}/${slug}`} article={article} />
-
-      <section className="w-full bg-[#FFF7F2] border-b border-[rgba(9,37,41,0.07)]">
-        <div className={`mx-auto max-w-[1280px] ${sectionPad} py-8 md:py-10 lg:py-12`}>
-          <nav className="flex items-center gap-2 flex-wrap" aria-label="Localização">
-            <Link to="/" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Homepage</Link>
-            <Sep />
-            <Link to="/conteudos" className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>Conteúdos</Link>
-            <Sep />
-            <Link to={`/conteudos/${category}`} className="font-['Noto_Sans',sans-serif] text-[13px] hover:text-[#092529] transition-colors" style={{ color: muted }}>{catObj?.name}</Link>
-          </nav>
-
-          <div className="mt-6 md:mt-8 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] gap-8 lg:gap-10 items-start">
-            <MotionBox
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, ease: easeOut, delay: 0.05 }}
-              className="flex flex-col gap-5 md:gap-6 min-w-0 max-w-[720px]"
-            >
-              <span className="inline-flex items-center gap-2 self-start bg-[#AFD7BF] text-[#092529] px-3 py-1.5 rounded-full text-[12px] font-semibold font-['Noto_Sans',sans-serif]">
-                <CatIcon slug={article.categorySlug} size={12} />
-                {article.category}
-              </span>
-              <h1 className="font-['Merriweather',serif] font-bold text-[#092529] text-[32px] md:text-[40px] lg:text-[44px] leading-[1.12] tracking-[-0.02em]">
-                {article.title}
-              </h1>
-              <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[16px] md:text-[17px] leading-[1.7]">
-                {article.excerpt}
-              </p>
-              <div className="flex flex-wrap items-center gap-4 pt-1">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl overflow-hidden border border-[#AFD7BF] shrink-0">
-                    <img src={imgAbout} alt="Breno Vieira, psicólogo clínico" width={80} height={80} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <p className="font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[13px] leading-none">Breno</p>
-                    <p className="font-['Noto_Sans',sans-serif] text-[12px] mt-0.5" style={{ color: muted }}>Psicólogo Clínico · CRP 03/36165</p>
-                  </div>
-                </div>
-                <span className="hidden sm:block w-px h-8 bg-[rgba(9,37,41,0.1)]" />
-                <Meta date={article.date} readTime={article.readTime} />
-                <span className="hidden sm:block w-px h-8 bg-[rgba(9,37,41,0.1)]" />
-                <div className="flex items-center gap-1.5">
-                  <span className="font-['Noto_Sans',sans-serif] text-[12px] font-semibold" style={{ color: muted }}>Compartilhar</span>
-                  <a
-                    href={whatsappArticleShareUrl(article.title, `/conteudos/${category}/${slug}`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Compartilhar no WhatsApp"
-                    className="w-8 h-8 rounded-xl flex items-center justify-center bg-[rgba(9,37,41,0.05)] hover:bg-[#AFD7BF] transition-colors"
-                  >
-                    <WhatsAppIcon size={13} className="text-[#092529]" />
-                  </a>
-                  <button
-                    type="button"
-                    onClick={handleShare}
-                    aria-label={shareStatus === "copied" ? "Link copiado" : "Compartilhar"}
-                    className="w-8 h-8 rounded-xl flex items-center justify-center bg-[rgba(9,37,41,0.05)] hover:bg-[#AFD7BF] transition-colors"
-                  >
-                    <Share2 size={13} color={dark} />
-                  </button>
-                  {shareStatus === "copied" && (
-                    <span className="font-['Noto_Sans',sans-serif] text-[11px] font-semibold text-[#2d6b4a]">
-                      Link copiado!
-                    </span>
-                  )}
-                </div>
-              </div>
-            </MotionBox>
-
-            <MotionBox
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.65, ease: easeOut, delay: 0.15 }}
-              className="relative rounded-3xl overflow-hidden aspect-[16/10] lg:aspect-auto lg:h-[min(100%,320px)] lg:min-h-[280px] border border-[rgba(9,37,41,0.06)] shadow-[0_16px_48px_rgba(9,37,41,0.1)]"
-            >
-              <img src={article.image} alt={article.title} width={800} height={500} loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 size-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(9,37,41,0.25)] to-transparent pointer-events-none" />
-            </MotionBox>
-          </div>
-        </div>
-      </section>
-
-      <section className="w-full bg-[#FFF7F2] py-12 md:py-16 lg:py-20">
-        <div className={`mx-auto max-w-[1280px] ${sectionPad}`}>
-          <div className="grid grid-cols-1 lg:grid-cols-[180px_minmax(0,1fr)] gap-10 lg:gap-14 xl:gap-16">
-            <aside className="hidden lg:block">
-              <ArticleToc slug={article.slug} />
-            </aside>
-
-            <article className="min-w-0 max-w-[720px] lg:max-w-none mx-auto lg:mx-0">
-              {!hasStructuredBody && (
-                <p className="font-['Noto_Sans',sans-serif] font-semibold text-[#092529] text-[18px] md:text-[19px] leading-[1.75] pl-5 md:pl-6 border-l-[3px] border-[#AFD7BF] mb-8 md:mb-10">
-                  {article.excerpt}
-                </p>
-              )}
-
-              <ArticleBody blocks={blocks} />
-
-              <div className="mt-10 md:mt-12 rounded-2xl border border-[rgba(9,37,41,0.08)] bg-[#F8EDE4] p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="flex-1 min-w-0">
-                  <p className="font-['Merriweather',serif] font-bold text-[#092529] text-[20px] md:text-[22px] leading-[1.3] mb-1.5">
-                    Quer dar o primeiro passo?
-                  </p>
-                  <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[15px] leading-[1.6]">
-                    Entre em contato pelo WhatsApp para agendar sua primeira consulta online.
-                  </p>
-                </div>
-                <a href={WA} target="_blank" rel="noopener noreferrer"
-                  className={`${ctaBtn} md:shrink-0 gap-2 bg-[#092529] hover:bg-[#0e3a40] text-[#FFF7F2] px-7 py-4 rounded-xl font-['Noto_Sans',sans-serif] font-bold text-[15px] transition-colors focus-visible:outline-2 focus-visible:outline-white`}>
-                  <WhatsAppIcon size={15} className="text-current" />Agendar consulta
-                </a>
-              </div>
-
-              <div className="mt-10 md:mt-12 border-t border-[rgba(9,37,41,0.08)] pt-10 flex flex-col sm:flex-row gap-5 items-start">
-                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#AFD7BF] shrink-0">
-                  <img src={imgAbout} alt="Breno Vieira, psicólogo clínico" width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex flex-col gap-2 min-w-0">
-                  <p className="font-['Merriweather',serif] font-bold text-[#092529] text-[18px]">Breno — Psicólogo Clínico</p>
-                  <p className="font-['Noto_Sans',sans-serif] text-[rgba(9,37,41,0.72)] text-[14px] leading-[1.7]">
-                    Psicólogo clínico registrado no CRP 03/36165, com atendimento online para adultos e idosos em Salvador, todo o Brasil e brasileiros no exterior. Especialista em psicanálise, ansiedade, autoestima e relacionamentos.
-                  </p>
-                  <a href={WA} target="_blank" rel="noopener noreferrer"
-                    className={`${ctaBtn} gap-2 bg-[#AFD7BF] hover:bg-[#9DCAAF] px-5 py-2.5 rounded-xl font-['Noto_Sans',sans-serif] font-bold text-[#092529] text-[13px] transition-colors mt-1`}>
-                    <WhatsAppIcon size={13} className="text-current" />Agendar consulta
-                  </a>
-                </div>
-              </div>
-
-              <div className="mt-10 flex flex-wrap items-center gap-2">
-                <span className="font-['Noto_Sans',sans-serif] font-semibold text-[11px] uppercase tracking-[0.1em] mr-1" style={{ color: muted }}>Temas</span>
-                {CATEGORIES.map(c => (
-                  <Link key={c.slug} to={`/conteudos/${c.slug}`}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold font-['Noto_Sans',sans-serif] transition-colors
-                      ${c.slug === category
-                        ? "bg-[#AFD7BF] text-[#092529]"
-                        : "bg-[rgba(9,37,41,0.06)] text-[rgba(9,37,41,0.6)] hover:bg-[#EBDFD6] hover:text-[#092529]"
-                      }`}>
-                    <CatIcon slug={c.slug} size={11} />{c.name}
-                  </Link>
-                ))}
-              </div>
-
-              <ArticleRecommendedReading currentSlug={article.slug} />
-            </article>
-          </div>
-        </div>
-      </section>
-
-      {related.length > 0 && (
-        <section className={`w-full bg-[#FFF7F2] py-14 md:py-20 lg:py-24 border-t border-[rgba(9,37,41,0.06)]`}>
-          <div className={`mx-auto max-w-[1280px] ${sectionPad} flex flex-col gap-8 md:gap-10`}>
-            <Reveal className="flex items-end justify-between gap-4">
-              <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[32px] lg:text-[36px] leading-[1.2]">
-                Mais artigos de <em>{catObj?.name}</em>
-              </h2>
-              <Link to={`/conteudos/${category}`}
-                className="hidden sm:inline-flex items-center gap-1.5 font-['Noto_Sans',sans-serif] font-semibold text-[rgba(9,37,41,0.45)] hover:text-[#092529] text-[13px] transition-colors shrink-0">
-                Ver todos <ArrowRight size={13} />
-              </Link>
-            </Reveal>
-            <div className="grid grid-cols-1 gap-5 md:hidden">
-              {related.map(a => <ArticleCard key={a.slug} article={a} />)}
-            </div>
-            <div className="hidden md:block lg:hidden">
-              <ArticleCardsCarousel articles={related} />
-            </div>
-            <div className="hidden lg:grid lg:grid-cols-3 gap-5">
-              {related.map(a => <ArticleCard key={a.slug} article={a} />)}
-            </div>
-            <Link
-              to={`/conteudos/${category}`}
-              className="md:hidden flex items-center justify-center gap-2 py-4 border border-[rgba(9,37,41,0.12)] rounded-2xl font-['Noto_Sans',sans-serif] font-semibold text-[#092529] text-[14px] hover:bg-[rgba(9,37,41,0.03)]"
-            >
-              Ver todos de {catObj?.name} <ArrowRight size={14} />
-            </Link>
-          </div>
-        </section>
-      )}
-
       <CTABanner />
     </>
   );
@@ -2131,7 +1659,9 @@ function NotFoundPage() {
   );
 }
 
-let __lenis: Lenis | null = null;
+type LenisInstance = InstanceType<typeof Lenis>;
+
+let __lenis: LenisInstance | null = null;
 
 function ScrollReset() {
   const { pathname } = useLocation();
@@ -2149,14 +1679,17 @@ function SEOHead({
   pathname,
   article,
   noindex = false,
+  faq,
 }: {
   pathname: string;
   article?: Article;
   noindex?: boolean;
+  faq?: FAQItem[];
 }) {
   useEffect(() => {
     const seo = getPageSEO(pathname, {
       noindex,
+      faq,
       article: article
         ? {
             title: article.title,
@@ -2172,13 +1705,17 @@ function SEOHead({
     injectHeadTags(seo);
 
     if (pathname === "/") {
-      injectLcpPreloadsFromUrls(imgHeroMobile, imgHero);
+      if (!document.querySelector('link[rel="preload"][as="image"]')) {
+        injectLcpPreloadsFromUrls(imgHeroMobile, imgHero);
+      }
+    } else if (pathname === "/sobre") {
+      injectLcpPreloadsFromUrls(imgAboutMobile, imgAbout);
     } else if (article?.image) {
       injectLcpPreloadsFromUrls(undefined, article.image);
     } else {
       document.querySelectorAll("link[data-lcp-preload]").forEach((node) => node.remove());
     }
-  }, [pathname, article, noindex]);
+  }, [pathname, article, noindex, faq]);
   return null;
 }
 
@@ -2213,17 +1750,62 @@ function StickyCtaBar() {
   );
 }
 
+const ArticleRoute = lazy(() => import("./ArticleRoute"));
+
+function ArticlePageFallback() {
+  return <div className="min-h-[40vh] bg-[#FFF7F2]" aria-busy="true" aria-label="Carregando artigo" />;
+}
+
+export {
+  ARTICLES,
+  ARTICLE_IMAGES,
+  CATEGORIES,
+  WA,
+  sectionPad,
+  sectionPy,
+  ctaBtn,
+  muted,
+  dark,
+  easeOut,
+  imgAbout,
+  heroTitle,
+  sectionTitle,
+  splitRow,
+  aboutImage,
+  specialtyGrid,
+  SEOHead,
+  NotFoundPage,
+  MotionBox,
+  Reveal,
+  CTABanner,
+  FAQAccordion,
+  Meta,
+  Sep,
+  Label,
+  CatIcon,
+  WhatsAppIcon,
+  AboutImage,
+  HeroHighlights,
+  ArticleCard,
+  ArticleCardsCarousel,
+  sharePage,
+  whatsappArticleShareUrl,
+};
+export type { Article };
+
 export function AppLayout() {
   useEffect(() => {
     document.documentElement.lang = "pt-BR";
 
-    let lenis: Lenis | null = null;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+
+    let lenis: LenisInstance | null = null;
     let rafId = 0;
 
     const initLenis = () => {
       lenis = new Lenis({
         duration: 1.4,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
         touchMultiplier: 1.5,
         infinite: false,
@@ -2263,10 +1845,16 @@ export function AppLayout() {
       <Header />
       <main id="main-content" className="flex-1" role="main">
         <Routes>
+          <Route path="/sobre"                       element={<AboutPage />} />
+          <Route path="/politica-de-privacidade"     element={<PrivacyPolicyPage />} />
           <Route path="/"                          element={<HomePage />} />
           <Route path="/conteudos"                 element={<BlogHubPage />} />
           <Route path="/conteudos/:category"       element={<CategoryPage />} />
-          <Route path="/conteudos/:category/:slug" element={<ArticlePage />} />
+          <Route path="/conteudos/:category/:slug" element={
+            <Suspense fallback={<ArticlePageFallback />}>
+              <ArticleRoute />
+            </Suspense>
+          } />
           <Route path="*"                          element={<NotFoundPage />} />
         </Routes>
       </main>

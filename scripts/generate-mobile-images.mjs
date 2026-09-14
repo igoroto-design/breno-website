@@ -8,9 +8,17 @@ const assetsDir = join(__dirname, "..", "src", "assets");
 const VARIANTS = [
   {
     source: "breno-psicologo-hero.webp",
-    output: "breno-psicologo-hero-mobile.webp",
-    width: 720,
-    quality: 76,
+    outputWebp: "breno-psicologo-hero-mobile.webp",
+    outputAvif: "breno-psicologo-hero-mobile.avif",
+    width: 480,
+    webpQuality: 62,
+    avifQuality: 50,
+  },
+  {
+    source: "breno-psicologo-sobre.webp",
+    outputWebp: "breno-psicologo-sobre-mobile.webp",
+    width: 860,
+    webpQuality: 68,
   },
 ];
 
@@ -22,20 +30,26 @@ try {
   process.exit(0);
 }
 
-for (const { source, output, width, quality } of VARIANTS) {
+for (const variant of VARIANTS) {
+  const { source, outputWebp, width, webpQuality } = variant;
+  const outputAvif = variant.outputAvif;
+  const avifQuality = variant.avifQuality;
   const inputPath = join(assetsDir, source);
-  const outputPath = join(assetsDir, output);
 
   if (!existsSync(inputPath)) {
     console.log(`⚠ Missing ${source} — skipping`);
     continue;
   }
 
-  const buffer = await sharp(readFileSync(inputPath))
-    .resize({ width, withoutEnlargement: true })
-    .webp({ quality, effort: 4 })
-    .toBuffer();
+  const input = sharp(readFileSync(inputPath)).resize({ width, withoutEnlargement: true });
 
-  writeFileSync(outputPath, buffer);
-  console.log(`✓ ${output} (${(buffer.length / 1024).toFixed(0)} KB, max ${width}px wide)`);
+  const webpBuffer = await input.clone().webp({ quality: webpQuality, effort: 4 }).toBuffer();
+  writeFileSync(join(assetsDir, outputWebp), webpBuffer);
+  console.log(`✓ ${outputWebp} (${(webpBuffer.length / 1024).toFixed(0)} KB, max ${width}px wide)`);
+
+  if (outputAvif && avifQuality) {
+    const avifBuffer = await input.clone().avif({ quality: avifQuality, effort: 4 }).toBuffer();
+    writeFileSync(join(assetsDir, outputAvif), avifBuffer);
+    console.log(`✓ ${outputAvif} (${(avifBuffer.length / 1024).toFixed(0)} KB, max ${width}px wide)`);
+  }
 }

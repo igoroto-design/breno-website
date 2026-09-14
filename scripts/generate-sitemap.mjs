@@ -26,6 +26,8 @@ function urlEntry(loc, { lastmod, changefreq, priority }) {
 const entries = [];
 
 entries.push(urlEntry(`${SITE_BASE}/`, { changefreq: "weekly", priority: "1.0" }));
+entries.push(urlEntry(`${SITE_BASE}/sobre`, { lastmod: "2026-09-14", changefreq: "yearly", priority: "0.6" }));
+entries.push(urlEntry(`${SITE_BASE}/politica-de-privacidade`, { changefreq: "yearly", priority: "0.3" }));
 entries.push(urlEntry(`${SITE_BASE}/conteudos`, { changefreq: "weekly", priority: "0.9" }));
 
 for (const slug of CATEGORY_SLUGS) {

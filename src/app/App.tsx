@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { motion, MotionConfig } from "motion/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import useEmblaCarousel from "embla-carousel-react";
 import Lenis from "lenis";
 import {
@@ -1706,6 +1707,7 @@ export default function App() {
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
+      <SpeedInsights />
     </MotionConfig>
   );
 }

@@ -97,6 +97,9 @@ export function AboutPage() {
                   CRP 03/36165
                 </p>
                 <p className="font-['Noto_Sans',sans-serif] text-[#092529] text-[16px] md:text-[17px] leading-[1.7]">
+                  Psicólogo formado pela Escola Bahiana de Medicina e Saúde Pública, em Salvador.
+                </p>
+                <p className="font-['Noto_Sans',sans-serif] text-[#092529] text-[16px] md:text-[17px] leading-[1.7]">
                   Atendimento psicológico online para{" "}
                   <strong className="font-bold">adultos e idosos em todo o Brasil e brasileiros no exterior</strong>
                   , com orientação psicanalítica e base profissional em Salvador, Bahia.

@@ -235,7 +235,7 @@ export function getPageSEO(
   if (canonical === PERSON_PATH) {
     const title = "Sobre Breno Vieira, psicólogo clínico";
     const description =
-      "Breno Vieira é psicólogo clínico (CRP 03/36165), com atendimento online para adultos e idosos em todo o Brasil e brasileiros no exterior. Prática orientada pela psicanálise, com base em Salvador, Bahia.";
+      "Breno Vieira é psicólogo clínico (CRP 03/36165). Psicólogo formado pela Escola Bahiana de Medicina e Saúde Pública, em Salvador. Atendimento online para adultos e idosos em todo o Brasil e brasileiros no exterior, com prática orientada pela psicanálise.";
     return {
       title,
       fullTitle: buildFullTitle(title),
@@ -379,6 +379,16 @@ function personEntity(description: string): Record<string, unknown> {
     hasCredential: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "CRP 03/36165",
+    },
+    alumniOf: {
+      "@type": "EducationalOrganization",
+      name: "Escola Bahiana de Medicina e Saúde Pública",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Salvador",
+        addressRegion: "BA",
+        addressCountry: "BR",
+      },
     },
     knowsAbout: [
       "Psicoterapia",

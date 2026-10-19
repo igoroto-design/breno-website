@@ -44,6 +44,8 @@
     <script>
       (function () {
         var loaded = false;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function gtag(){window.dataLayer.push(arguments);};
         function loadGA() {
           if (loaded) return;
           loaded = true;
@@ -54,16 +56,24 @@
           s.src = "https://www.googletagmanager.com/gtag/js?id=G-7Y4ZLB9XP6";
           s.async = true;
           document.head.appendChild(s);
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag("js", new Date());
-          gtag("config", "G-7Y4ZLB9XP6");
+          window.gtag("js", new Date());
+          window.gtag("config", "G-7Y4ZLB9XP6");
         }
         ["scroll", "click", "touchstart", "keydown"].forEach(function (ev) {
           window.addEventListener(ev, loadGA, { once: true, passive: true, capture: true });
         });
         setTimeout(loadGA, 5000);
+        document.addEventListener("click", function (event) {
+          var node = event.target;
+          if (!node || !node.closest) return;
+          var link = node.closest("a");
+          if (!link || !link.href || link.href.indexOf("phone=5571997250690") === -1) return;
+          loadGA();
+          window.gtag("event", "whatsapp_click", {
+            page_path: window.location.pathname,
+            link_url: link.href.split("?")[0]
+          });
+        }, true);
       })();
     </script>
   </body>

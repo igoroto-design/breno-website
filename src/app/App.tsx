@@ -181,7 +181,7 @@ const RAW: [string,string,string,string,string,string,string][] = [
   ["ansiedade-12-sintomas","Ansiedade: 12 Sintomas Que Você Não Deve Ignorar","Conheça 12 sintomas de ansiedade que muitas pessoas carregam sem perceber, e saiba quando buscar ajuda psicológica.","Ansiedade","ansiedade","15 Jun 2025","10 min a ler"],
   ["o-que-e-psicanalise","O Que É Psicanálise? Significado, Como Funciona e Para Quem É Indicada","Psicanálise: o que é, o que significa na prática e como funciona o processo terapêutico. Entenda origem, sessões, inconsciente e para quem essa abordagem é indicada.","Psicanálise","psicanalise","15 Jun 2025","12 min a ler"],
   // Row 2, autoestima · relacionamentos · terapia
-  ["autoestima-baixa-sinais","Baixa Autoestima: Principais Sinais e Como Compreender o Que Está Por Trás Dela","A forma como nos enxergamos influencia praticamente todas as áreas da vida.","Autoestima","autoestima","25 Mai 2025","9 min a ler"],
+  ["autoestima-baixa-sinais","Baixa Autoestima: Principais Sinais e Como Compreender o Que Está Por Trás Dela","Baixa autoestima é uma visão excessivamente negativa de si. Veja sinais comuns e como a terapia pode ajudar a compreender o que está por trás deles.","Autoestima","autoestima","25 Mai 2025","9 min a ler"],
   ["relacionamento-toxico-sinais","Relacionamento Tóxico: 10 Sinais Que Merecem Atenção","Conflitos fazem parte de qualquer convivência, mas alguns padrões indicam um relacionamento tóxico que merece atenção.","Relacionamentos","relacionamentos","1 Jun 2025","12 min a ler"],
   ["como-saber-se-preciso-de-terapia","Como Saber se Preciso de Terapia? 10 Sinais Que Merecem Atenção","Descubra 10 sinais de que você pode se beneficiar da terapia, do ponto de vista de um psicanalista. Não é preciso estar em crise para começar.","Psicoterapia","psicoterapia","19 Jun 2025","10 min a ler"],
   // Row 3, ansiedade · psicanálise · autoestima
@@ -190,26 +190,26 @@ const RAW: [string,string,string,string,string,string,string][] = [
   ["critica-interna-como-lidar","Por Que Sou Tão Crítico Comigo Mesmo? Entenda as Raízes da Autocrítica Excessiva","A autocrítica excessiva pode minar a autoestima e a qualidade de vida, entenda suas raízes e como a terapia ajuda.","Autoestima","autoestima","5 Jun 2025","11 min a ler"],
   // Row 4, relacionamentos · terapia · ansiedade
   ["medo-de-abandono","Medo de Abandono: Por Que Tenho Tanto Medo de Ser Deixado?","O medo de abandono pode gerar angústia intensa nos relacionamentos, entenda suas origens e como a terapia pode ajudar.","Relacionamentos","relacionamentos","5 Jun 2025","10 min a ler"],
-  ["terapia-online-funciona","Terapia Online Funciona? Entenda Como São as Sessões e os Benefícios","Entenda como funciona a terapia online, como são as sessões por videochamada e por que ela pode ser tão eficaz quanto o atendimento presencial.","Psicoterapia","psicoterapia","15 Jun 2025","8 min a ler"],
+  ["terapia-online-funciona","Terapia Online Funciona? Entenda Como São as Sessões e os Benefícios","Como funciona a terapia online, como é uma sessão por videochamada e o que muda em relação ao presencial. A escolha depende da rotina, da privacidade e do vínculo com o profissional.","Psicoterapia","psicoterapia","15 Jun 2025","8 min a ler"],
   ["pensamentos-acelerados","Pensamentos Acelerados: O Que Podem Significar?","Quando a mente não para, pensamentos surgem um atrás do outro e podem indicar ansiedade ou sobrecarga emocional.","Ansiedade","ansiedade","1 Jun 2025","9 min a ler"],
   // Row 5, psicanálise · autoestima · relacionamentos
   ["psicanalise-vs-tcc","Qual a Diferença Entre Psicanálise e TCC? Entenda as Principais Características","Ao procurar um psicólogo, muitas pessoas se deparam com diferentes abordagens, conheça as diferenças entre psicanálise e TCC.","Psicanálise","psicanalise","19 Jun 2025","10 min a ler"],
   ["inseguranca","Insegurança: Quando Procurar Ajuda e Como Compreender Esse Sentimento","Sentir insegurança em determinados momentos é natural, mas quando ela se torna constante, pode merecer atenção.","Autoestima","autoestima","19 Jun 2025","8 min a ler"],
   ["ciumes-em-excesso","Ciúmes em Excesso: Quando Se Torna Um Problema?","Ciúmes podem surgir em qualquer relacionamento, o problema é quando se tornam excessivos e geram sofrimento.","Relacionamentos","relacionamentos","15 Jun 2025","10 min a ler"],
   // Row 6, terapia · ansiedade · psicanálise
-  ["terapia-online-ou-presencial","Terapia Online ou Presencial: Qual a Melhor Opção?","Se você está pensando em começar terapia, provavelmente já se perguntou qual modalidade faz mais sentido para você.","Psicoterapia","psicoterapia","19 Jun 2025","8 min a ler"],
+  ["terapia-online-ou-presencial","Terapia Online ou Presencial: Qual a Melhor Opção?","Terapia online ou presencial: os dois formatos podem servir, e a melhor escolha depende da rotina, da privacidade e do que ajuda a manter o acompanhamento.","Psicoterapia","psicoterapia","19 Jun 2025","8 min a ler"],
   ["ansiedade-sintomas-fisicos","Ansiedade Pode Causar Sintomas Físicos? Entenda Como o Corpo Também Fala","A ansiedade não afeta apenas a mente, o corpo também manifesta tensão, palpitações e outros sintomas físicos.","Ansiedade","ansiedade","25 Mai 2025","10 min a ler"],
   ["psicanalise-online","Psicanálise Online Funciona? Entenda Como Acontecem as Sessões","A psicanálise online tornou o processo analítico mais acessível para pessoas em diferentes cidades e contextos.","Psicanálise","psicanalise","10 Jun 2025","8 min a ler"],
   // Row 7, autoestima · relacionamentos · terapia
-  ["terapia-ajuda-autoestima","Como a Terapia Pode Ajudar na Autoestima?","A autoestima influencia como nos relacionamos com nós mesmos, com os outros e com o mundo.","Autoestima","autoestima","15 Jun 2025","9 min a ler"],
+  ["terapia-ajuda-autoestima","Como a Terapia Pode Ajudar na Autoestima?","Como a terapia pode ajudar quem convive com uma autoestima fragilizada: o que a escuta trabalha e o que ela não promete.","Autoestima","autoestima","15 Jun 2025","9 min a ler"],
   ["dependencia-emocional","Dependência Emocional: O Que É, Principais Sinais e Como Superar","Saiba o que é dependência emocional, como ela se manifesta e como construir relações mais saudáveis.","Relacionamentos","relacionamentos","25 Mai 2025","10 min a ler"],
   ["como-escolher-um-psicologo","Psicólogo em Salvador: Como Escolher o Profissional Ideal Para Você","Veja como escolher um psicólogo online para pacientes de Salvador: critérios, abordagens e sinais de que você encontrou o profissional certo.","Psicoterapia","psicoterapia","1 Jun 2025","8 min a ler"],
   // Row 8, psicanálise · terapia · psicanálise
   ["quando-procurar-psicanalista","Quando Procurar um Psicanalista? Sinais de Que a Psicanálise Pode Ajudar","Quando procurar um psicanalista? Veja sinais de que a psicanálise pode ajudar, o que faz um psicanalista e como saber se essa abordagem combina com você.","Psicanálise","psicanalise","25 Mai 2025","9 min a ler"],
-  ["o-que-esperar-da-primeira-sessao","O Que Esperar da Primeira Sessão de Terapia?","Decidir procurar ajuda psicológica costuma ser um passo importante, e a primeira sessão pode trazer muitas dúvidas.","Psicoterapia","psicoterapia","10 Jun 2025","7 min a ler"],
+  ["o-que-esperar-da-primeira-sessao","O Que Esperar da Primeira Sessão de Terapia?","O que costuma acontecer na primeira sessão de terapia: o que falar, se é preciso contar toda a história e quanto tempo dura o encontro.","Psicoterapia","psicoterapia","10 Jun 2025","7 min a ler"],
   ["quanto-tempo-dura-psicanalise","Quanto Tempo Dura a Psicanálise? Entenda Como Funciona o Processo Analítico","A duração da psicanálise varia conforme objetivos, história e rito de cada pessoa, não existe um prazo fixo.","Psicanálise","psicanalise","5 Jun 2025","10 min a ler"],
   // Row 9
-  ["quanto-tempo-dura-a-terapia","Quanto Tempo Dura a Terapia? Entenda Como Funciona o Processo Terapêutico","Uma das perguntas mais comuns entre quem está pensando em iniciar acompanhamento psicológico é quanto tempo dura a terapia.","Psicoterapia","psicoterapia","5 Jun 2025","9 min a ler"],
+  ["quanto-tempo-dura-a-terapia","Quanto Tempo Dura a Terapia? Entenda Como Funciona o Processo Terapêutico","Uma sessão de terapia costuma durar cerca de 50 minutos. O processo, por outro lado, não tem um número fixo de encontros.","Psicoterapia","psicoterapia","5 Jun 2025","9 min a ler"],
 ];
 
 const ARTICLES: Article[] = RAW.map(([slug,title,excerpt,category,categorySlug,date,readTime], i) => ({
@@ -1235,151 +1235,11 @@ function HomePage() {
   );
 }
 
-const GRID_ROWS = 3;
-
-function useGridColumns() {
-  const [cols, setCols] = useState(3);
-  useEffect(() => {
-    const md = window.matchMedia("(min-width: 768px)");
-    const lg = window.matchMedia("(min-width: 1024px)");
-    const update = () => {
-      if (lg.matches) setCols(3);
-      else if (md.matches) setCols(2);
-      else setCols(1);
-    };
-    update();
-    md.addEventListener("change", update);
-    lg.addEventListener("change", update);
-    return () => {
-      md.removeEventListener("change", update);
-      lg.removeEventListener("change", update);
-    };
-  }, []);
-  return cols;
-}
-
-function articlePageNumbers(current: number, total: number, maxSlots = 7): (number | "ellipsis")[] {
-  if (total <= maxSlots) return Array.from({ length: total }, (_, i) => i + 1);
-  if (current <= 4) return [1, 2, 3, 4, 5, "ellipsis", total];
-  if (current >= total - 3) return [1, "ellipsis", total - 4, total - 3, total - 2, total - 1, total];
-  return [1, "ellipsis", current - 1, current, current + 1, "ellipsis", total];
-}
-
-function ArticlePagination({
-  page,
-  totalPages,
-  onPageChange,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}) {
-  if (totalPages <= 1) return null;
-  const pages = articlePageNumbers(page, totalPages);
-  const mobilePages = articlePageNumbers(page, totalPages, 4);
-  const btn =
-    "flex items-center justify-center min-w-9 h-9 md:min-w-10 md:h-10 rounded-xl font-['Noto_Sans',sans-serif] font-semibold text-[13px] border transition-colors shrink-0";
-  const arrowBtn = `${btn} w-9 md:w-10 px-0 text-[#092529] border-[rgba(9,37,41,0.13)] hover:border-[rgba(9,37,41,0.25)] disabled:opacity-40 disabled:pointer-events-none`;
-
-  const pageBtn = (p: number) => (
-    <button
-      key={p}
-      type="button"
-      onClick={() => onPageChange(p)}
-      aria-label={`Página ${p}`}
-      aria-current={p === page ? "page" : undefined}
-      className={`${btn} px-2.5 md:px-3 ${p === page ? "bg-[#092529] text-[#FFF7F2] border-[#092529]" : "text-[#092529] border-[rgba(9,37,41,0.13)] hover:border-[rgba(9,37,41,0.25)]"}`}
-    >
-      {p}
-    </button>
-  );
-
-  return (
-    <nav className="flex items-center justify-center gap-2 md:gap-2 pt-4 w-full max-w-full" aria-label="Paginação de artigos">
-      <button
-        type="button"
-        onClick={() => onPageChange(page - 1)}
-        disabled={page <= 1}
-        aria-label="Página anterior"
-        className={arrowBtn}
-      >
-        <ChevronLeft size={18} />
-      </button>
-
-      {totalPages <= 4 ? (
-        <div className="flex items-center gap-1 md:hidden">
-          {mobilePages.map((p, i) =>
-            p === "ellipsis" ? (
-              <span
-                key={`mobile-ellipsis-${i}`}
-                className="flex items-center justify-center w-8 h-9 font-['Noto_Sans',sans-serif] text-[13px] text-[rgba(9,37,41,0.45)]"
-                aria-hidden
-              >
-                …
-              </span>
-            ) : (
-              pageBtn(p)
-            ),
-          )}
-        </div>
-      ) : (
-        <p className="md:hidden min-w-[6.5rem] text-center font-['Noto_Sans',sans-serif] font-semibold text-[13px] text-[#092529] tabular-nums">
-          Página {page} de {totalPages}
-        </p>
-      )}
-
-      <div className="hidden md:flex items-center gap-1.5">
-        {pages.map((p, i) =>
-          p === "ellipsis" ? (
-            <span
-              key={`ellipsis-${i}`}
-              className="flex items-center justify-center w-10 h-10 font-['Noto_Sans',sans-serif] text-[13px] text-[rgba(9,37,41,0.45)]"
-              aria-hidden
-            >
-              …
-            </span>
-          ) : (
-            pageBtn(p)
-          ),
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={() => onPageChange(page + 1)}
-        disabled={page >= totalPages}
-        aria-label="Próxima página"
-        className={arrowBtn}
-      >
-        <ChevronRight size={18} />
-      </button>
-    </nav>
-  );
-}
-
 function BlogHubPage() {
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [slide, setSlide] = useState(0);
-  const [page, setPage] = useState(1);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const cols = useGridColumns();
-  const perPage = cols * GRID_ROWS;
   const featured = getFeaturedArticles();
   const filtered = activeCat ? ARTICLES.filter(a => a.categorySlug === activeCat) : ARTICLES;
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
-
-  useEffect(() => { setPage(1); }, [activeCat]);
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [page, totalPages]);
-
-  const goToPage = (next: number) => {
-    setPage(next);
-    requestAnimationFrame(() => {
-      gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
   return (
     <>
       <SEOHead pathname="/conteudos" />
@@ -1481,11 +1341,8 @@ function BlogHubPage() {
             <h1 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15] shrink-0">Artigos de psicologia</h1>
             <CategoryFilterNav activeSlug={activeCat} onSelect={setActiveCat} />
           </Reveal>
-          <div ref={gridRef} className="flex flex-col gap-6 scroll-mt-28">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {paginated.map(a => <ArticleCard key={a.slug} article={a} />)}
-            </div>
-            <ArticlePagination page={page} totalPages={totalPages} onPageChange={goToPage} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map(a => <ArticleCard key={a.slug} article={a} />)}
           </div>
         </div>
       </section>
@@ -1496,27 +1353,9 @@ function BlogHubPage() {
 
 function CategoryPage() {
   const { category } = useParams();
-  const [page, setPage] = useState(1);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const cols = useGridColumns();
-  const perPage = cols * GRID_ROWS;
   const cat = CATEGORIES.find(c => c.slug === category);
   const articles = ARTICLES.filter(a => a.categorySlug === category);
-  const totalPages = Math.max(1, Math.ceil(articles.length / perPage));
-  const paginated = articles.slice((page - 1) * perPage, page * perPage);
   const entryPoints = cat ? CATEGORY_ENTRY_POINTS[cat.slug] : undefined;
-
-  useEffect(() => { setPage(1); }, [category]);
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [page, totalPages]);
-
-  const goToPage = (next: number) => {
-    setPage(next);
-    requestAnimationFrame(() => {
-      gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  };
 
   if (!cat) return <NotFoundPage />;
   return (
@@ -1620,11 +1459,8 @@ function CategoryPage() {
             <h2 className="font-['Merriweather',serif] font-bold text-[#092529] text-[28px] md:text-[30px] lg:text-[32px] leading-[1.15] shrink-0">Artigos</h2>
             <CategoryFilterNav activeSlug={category ?? null} />
           </Reveal>
-          <div ref={gridRef} className="flex flex-col gap-6 scroll-mt-28">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {paginated.map(a => <ArticleCard key={a.slug} article={a} />)}
-            </div>
-            <ArticlePagination page={page} totalPages={totalPages} onPageChange={goToPage} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {articles.map(a => <ArticleCard key={a.slug} article={a} />)}
           </div>
         </div>
       </section>

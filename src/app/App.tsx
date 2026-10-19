@@ -209,7 +209,7 @@ const RAW: [string,string,string,string,string,string,string][] = [
   ["o-que-esperar-da-primeira-sessao","O Que Esperar da Primeira Sessão de Terapia?","O que costuma acontecer na primeira sessão de terapia: o que falar, se é preciso contar toda a história e quanto tempo dura o encontro.","Psicoterapia","psicoterapia","10 Jun 2025","7 min a ler"],
   ["quanto-tempo-dura-psicanalise","Quanto Tempo Dura a Psicanálise? Entenda Como Funciona o Processo Analítico","A duração da psicanálise varia conforme objetivos, história e rito de cada pessoa, não existe um prazo fixo.","Psicanálise","psicanalise","5 Jun 2025","10 min a ler"],
   // Row 9
-  ["quanto-tempo-dura-a-terapia","Quanto Tempo Dura a Terapia? Entenda Como Funciona o Processo Terapêutico","Uma sessão de terapia costuma durar cerca de 50 minutos. O processo, por outro lado, não tem um número fixo de encontros.","Psicoterapia","psicoterapia","5 Jun 2025","9 min a ler"],
+  ["quanto-tempo-dura-a-terapia","Quanto Tempo Dura a Terapia? Entenda Como Funciona o Processo Terapêutico","A duração de uma sessão não é a mesma para todas as pessoas: ela é combinada conforme a necessidade de cada uma. O processo não tem um número fixo de encontros.","Psicoterapia","psicoterapia","5 Jun 2025","9 min a ler"],
 ];
 
 const ARTICLES: Article[] = RAW.map(([slug,title,excerpt,category,categorySlug,date,readTime], i) => ({

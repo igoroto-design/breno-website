@@ -468,7 +468,7 @@ export const ARTICLE_BLOCKS: Record<string, ArticleBlock[]> = {
     { type: "p", text: "O que sustenta um processo terapêutico não é o cômodo em que ele acontece, mas a qualidade da escuta, a consistência do vínculo e o compromisso construído ao longo das sessões. A terapia online pode ser um lugar para falar de ansiedade, conflitos, relacionamentos e autoestima. Isso não torna o formato equivalente ao presencial para todas as pessoas, nem garante um resultado." },
     { type: "p", text: "Entre as questões mais frequentemente trabalhadas estão a ansiedade, detalhada em Ansiedade: 12 Sintomas Que Você Não Deve Ignorar,, a baixa autoestima e os conflitos nos relacionamentos, que aparecem em profundidade em Relacionamento Tóxico: Como Identificar Padrões Que Machucam." },
     { type: "h2", text: "Como funciona uma sessão de terapia online" },
-    { type: "p", text: "O funcionamento é mais simples do que muitas pessoas imaginam. No horário combinado, paciente e psicólogo se conectam por uma plataforma de videochamada segura. A sessão costuma durar cerca de 50 minutos, com frequência semanal, embora isso possa variar de acordo com as necessidades de cada processo." },
+    { type: "p", text: "O funcionamento é mais simples do que muitas pessoas imaginam. No horário combinado, paciente e psicólogo se conectam por uma plataforma de videochamada segura. A duração de cada encontro não é a mesma para todas as pessoas: ela é combinada conforme a necessidade de cada processo. A frequência mais comum é semanal." },
     { type: "p", text: "Durante esse tempo, existe um espaço reservado para falar sobre pensamentos, sentimentos, situações cotidianas e questões mais profundas que estejam gerando sofrimento ou despertando reflexões importantes. Não é necessário chegar com um roteiro definido: a sessão se constrói a partir daquilo que surge naquele momento." },
     { type: "callout", parts: [
         { text: "Se essa for sua primeira experiência com terapia, pode ser útil entender com mais detalhes " },
@@ -651,7 +651,7 @@ export const ARTICLE_BLOCKS: Record<string, ArticleBlock[]> = {
     { type: "h2", text: "Terapia online também para a terceira idade em Salvador" },
     { type: "p", text: "Entre pacientes idosos de Salvador e da Bahia, o atendimento psicológico online tem se mostrado uma alternativa especialmente prática: elimina deslocamentos, permite que a sessão aconteça em um ambiente já familiar e favorece a continuidade do acompanhamento mesmo diante de limitações de mobilidade." },
     { type: "h2", text: "Como funciona o atendimento psicológico online" },
-    { type: "p", text: "As sessões acontecem por videochamada, em horário previamente agendado, com a mesma duração e frequência de qualquer processo terapêutico estruturado, geralmente semanal, com cerca de 50 minutos por encontro." },
+    { type: "p", text: "As sessões acontecem por videochamada, em horário previamente agendado. A duração de cada encontro não é a mesma para todas as pessoas: ela é combinada conforme a necessidade de cada processo. A frequência mais comum é semanal." },
     { type: "p", parts: [{ text: "O atendimento online permite que pessoas de Salvador, de qualquer região do Brasil ou que vivam no exterior tenham acesso ao acompanhamento psicológico sem necessidade de deslocamento, mantendo a qualidade da escuta. Quem nunca passou por isso pode se interessar por " }, { text: "O Que Esperar da Primeira Sessão de Terapia?", link: { slug: "o-que-esperar-da-primeira-sessao", categorySlug: "psicoterapia" } }, { text: "." }] },
     { type: "h2", text: "Perguntas frequentes" },
     { type: "faq", items: [
@@ -818,7 +818,7 @@ export const ARTICLE_BLOCKS: Record<string, ArticleBlock[]> = {
     { type: "faq", items: [
       { q: "Preciso saber exatamente o que dizer?", a: "Não. A terapia é, justamente, um espaço para organizar pensamentos, sentimentos e experiências ao longo do tempo." },
       { q: "Posso ficar emocionado durante a sessão?", a: "Sim. Emoções fazem parte do processo terapêutico e são acolhidas com respeito, sem julgamento." },
-      { q: "Quanto tempo dura a primeira sessão?", a: "Geralmente cerca de 50 minutos, podendo variar de acordo com a prática de cada profissional." },
+      { q: "Quanto tempo dura a primeira sessão?", a: "Não há um tempo definido para todas as pessoas. A duração do primeiro encontro, como a dos seguintes, é combinada conforme a necessidade de cada uma." },
       { q: "A primeira sessão é apenas para conhecer o psicólogo?", a: "Ela também serve para isso, mas já é considerada parte integrante do processo terapêutico." },
       { q: "Vale a pena fazer terapia online?", a: "Sim. O atendimento online oferece praticidade e flexibilidade, podendo ser tão acolhedor quanto outros formatos, veja mais em Terapia Online ou Presencial: Qual a Melhor Opção?. Por fim, vale lembrar que o vínculo construído na primeira sessão é apenas o começo de uma relação que vai se desenvolvendo, sessão após sessão, ao longo do tempo. Não é necessário que tudo se resolva, se compreenda ou mesmo se sinta completamente confortável já no primeiro encontro, essa construção gradual faz parte do próprio processo terapêutico." }
     ] },
@@ -954,7 +954,7 @@ export const ARTICLE_BLOCKS: Record<string, ArticleBlock[]> = {
     { type: "p", text: "“Quanto tempo dura a terapia?” é, talvez, uma das primeiras perguntas que qualquer pessoa faz antes de iniciar um processo terapêutico. A dúvida é absolutamente compreensível: antes de se comprometer com algo, é natural querer saber quanto tempo será necessário dedicar a ele." },
     { type: "p", text: "A resposta, porém, foge do que costumamos esperar de outros tipos de tratamento: a terapia não possui uma duração fixa ou um número determinado de sessões para todas as pessoas. Cada processo é construído de forma única, porque cada pessoa carrega uma história, experiências e objetivos diferentes." },
     { type: "h2", text: "Quanto tempo dura uma sessão de terapia?" },
-    { type: "p", text: "Uma sessão costuma durar cerca de 50 minutos. Esse é o tempo de um encontro, não o tempo de todo o acompanhamento. A frequência mais comum é semanal, e tanto a duração do encontro quanto o intervalo entre as sessões podem ser combinados com o profissional." },
+    { type: "p", text: "Não há uma duração definida para todas as pessoas. Cada uma tem uma necessidade diferente, e o tempo do encontro é combinado a partir dela. Esse tempo é o de uma sessão, não o de todo o acompanhamento. A frequência mais comum é semanal." },
     { type: "p", text: "A pergunta “quanto tempo dura a terapia?” é outra. Ela se refere ao processo inteiro, que não tem um número fixo de encontros." },
     { type: "h2", text: "Existe um tempo certo para fazer terapia?" },
     { type: "p", text: "Não. Não existe um número ideal de sessões que funcione igualmente para todas as pessoas. Algumas procuram terapia para lidar com uma situação específica e permanecem em acompanhamento por alguns meses. Outras encontram, nesse espaço, um lugar contínuo de autoconhecimento e desenvolvimento emocional ao longo de anos." },
@@ -1009,7 +1009,7 @@ export const ARTICLE_BLOCKS: Record<string, ArticleBlock[]> = {
       ] },
     { type: "h2", text: "Perguntas frequentes" },
     { type: "faq", items: [
-      { q: "Quanto tempo dura uma sessão de terapia?", a: "Cerca de 50 minutos, em geral. A duração de uma sessão não define por quanto tempo a pessoa permanece em acompanhamento." },
+      { q: "Quanto tempo dura uma sessão de terapia?", a: "Não há um tempo definido para todas as pessoas. A duração de cada encontro é combinada conforme a necessidade de quem está em acompanhamento, e não define por quanto tempo esse processo continua." },
       { q: "Quantas sessões de terapia são necessárias?", a: "Não existe uma quantidade fixa. Cada pessoa possui necessidades e objetivos diferentes, que se revelam ao longo do próprio processo." },
       { q: "Posso fazer terapia por apenas alguns meses?", a: "Sim. Algumas pessoas procuram ajuda para questões específicas e realizam acompanhamento por períodos mais curtos. Isso pode fazer sentido quando o objetivo é pontual." },
       { q: "A terapia precisa durar anos?", a: "Não necessariamente. A duração varia de acordo com cada processo e com os objetivos definidos junto ao profissional." },
@@ -1449,7 +1449,7 @@ export const ARTICLE_BLOCKS: Record<string, ArticleBlock[]> = {
     { type: "p", text: "Na vida adulta, o tempo da análise costuma se relacionar a transições de carreira, relacionamentos e à construção de uma identidade mais consolidada. Já na terceira idade, o processo frequentemente assume um ritmo mais contemplativo, dedicado à revisão da própria trajetória, o que, por sua natureza, pode pedir um tempo de elaboração ainda mais alongado e cuidadoso." },
     { type: "h2", text: "Perguntas frequentes" },
     { type: "faq", items: [
-      { q: "Quanto tempo dura uma sessão de psicanálise?", a: "Normalmente, cerca de 50 minutos, embora isso possa variar de acordo com a prática do profissional." },
+      { q: "Quanto tempo dura uma sessão de psicanálise?", a: "Não há um tempo definido para todas as pessoas. A duração de cada sessão é combinada conforme a necessidade de quem está em análise." },
       { q: "Quantas sessões de psicanálise são necessárias?", a: "Não existe uma quantidade fixa. Cada processo é único, construído de acordo com as necessidades de cada pessoa." },
       { q: "A psicanálise dura anos?", a: "Pode durar meses ou anos, dependendo dos objetivos e necessidades de cada pessoa." },
       { q: "Posso encerrar a análise quando quiser?", a: "Sim. O encerramento é uma decisão construída ao longo do processo terapêutico, idealmente em conjunto com o profissional." }
